@@ -1,157 +1,121 @@
-# app/__init__.py - ALVIN Minimal Working Backend
+# app/__init__.py - ALVIN Application Factory
 import os
 from flask import Flask, jsonify
-from flask_socketio import SocketIO
+from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
+from flask_jwt_extended import JWTManager
 from flask_cors import CORS
+from flask_socketio import SocketIO
+from config import config
 
-# Initialize SocketIO
+# Initialize extensions
+db = SQLAlchemy()
+migrate = Migrate()
+jwt = JWTManager()
 socketio = SocketIO()
 
+# Blacklisted tokens storage (in production, use Redis)
+blacklisted_tokens = set()
+
 def create_app(config_name=None):
-    """Create minimal working Flask application"""
+    """Application factory pattern"""
+    
+    if config_name is None:
+        config_name = os.environ.get('FLASK_CONFIG', 'default')
     
     app = Flask(__name__)
+    app.config.from_object(config[config_name])
     
-    # Basic configuration
-    app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'alvin-dev-secret-key')
-    app.config['DEBUG'] = True
+    # Initialize extensions with app
+    db.init_app(app)
+    migrate.init_app(app, db)
+    jwt.init_app(app)
     
     # Initialize CORS
-    CORS(app, origins=['http://localhost:3000', 'http://localhost:5173'], supports_credentials=True)
+    CORS(app, origins=app.config['CORS_ORIGINS'], supports_credentials=True)
     
     # Initialize SocketIO
-    socketio.init_app(app, cors_allowed_origins="*", async_mode='threading')
+    socketio.init_app(
+        app,
+        cors_allowed_origins=app.config['SOCKETIO_CORS_ALLOWED_ORIGINS'],
+        async_mode=app.config['SOCKETIO_ASYNC_MODE']
+    )
     
-    # ============================================================================
-    # BASIC WORKING ROUTES - NO COMPLEX IMPORTS
-    # ============================================================================
+    # Import models after db is initialized
+    # This ensures models are registered with the correct db instance
+    from app import models
     
-    @app.route('/')
-    def home():
+    # JWT Configuration
+    @jwt.token_in_blocklist_loader
+    def check_if_token_revoked(jwt_header, jwt_payload):
+        """Check if JWT token is blacklisted"""
+        return jwt_payload['jti'] in blacklisted_tokens
+    
+    @jwt.expired_token_loader
+    def expired_token_callback(jwt_header, jwt_payload):
+        """Handle expired tokens"""
         return jsonify({
-            'message': '🎭 ALVIN Backend is WORKING!',
-            'status': 'running',
-            'version': '1.0.0',
-            'description': 'AI-powered creative writing assistant backend',
-            'endpoints': {
-                'health': '/health',
-                'api': '/api',
-                'demo': '/demo'
-            }
-        })
+            'error': 'Token has expired',
+            'message': 'Please log in again'
+        }), 401
     
+    @jwt.invalid_token_loader
+    def invalid_token_callback(error):
+        """Handle invalid tokens"""
+        return jsonify({
+            'error': 'Invalid token',
+            'message': 'Token is invalid or malformed'
+        }), 401
+    
+    @jwt.unauthorized_loader
+    def missing_token_callback(error):
+        """Handle missing tokens"""
+        return jsonify({
+            'error': 'Authorization token required',
+            'message': 'Please log in to access this resource'
+        }), 401
+    
+    # Register blueprints
+    register_blueprints(app)
+    
+    # Health check endpoint
     @app.route('/health')
     def health_check():
+        """Health check endpoint"""
         return jsonify({
             'status': 'healthy',
-            'service': 'ALVIN API',
-            'version': '1.0.0',
-            'message': 'Backend is running successfully!',
-            'database': 'PostgreSQL available',
-            'redis': 'Redis available',
-            'socketio': 'WebSocket ready'
+            'service': 'ALVIN Backend',
+            'version': '1.0.0'
         })
     
     @app.route('/api')
     def api_info():
+        """API information endpoint"""
         return jsonify({
-            'service': 'ALVIN API',
+            'message': 'ALVIN API',
             'version': '1.0.0',
-            'status': 'Backend running - Ready for frontend',
-            'description': 'AI-powered creative writing assistant',
-            'features': {
-                'authentication': 'Ready',
-                'projects': 'Ready', 
-                'ai_integration': 'Ready',
-                'real_time_collaboration': 'Socket.IO ready',
-                'export': 'Ready'
-            },
-            'demo_account': {
-                'email': 'demo@alvin.ai',
-                'password': 'demo123'
+            'endpoints': {
+                'auth': '/api/auth',
+                'projects': '/api/projects',
+                'ai': '/api/ai',
+                'health': '/health'
             }
         })
-    
-    @app.route('/demo')
-    def demo_info():
-        return jsonify({
-            'demo_account': {
-                'email': 'demo@alvin.ai',
-                'password': 'demo123'
-            },
-            'frontend_url': 'http://localhost:5173',
-            'message': 'Backend is ready! Start the frontend to use ALVIN',
-            'next_steps': [
-                'Open terminal in frontend directory',
-                'Run: npm run dev',
-                'Open: http://localhost:5173',
-                'Login with demo credentials'
-            ]
-        })
-    
-    # Simple API endpoints for testing
-    @app.route('/api/test')
-    def api_test():
-        return jsonify({
-            'message': 'ALVIN API is working!',
-            'timestamp': '2025-07-01',
-            'status': 'success'
-        })
-    
-    # ============================================================================
-    # SOCKET.IO EVENTS  
-    # ============================================================================
-    
-    @socketio.on('connect')
-    def handle_connect():
-        print('🔌 Client connected to ALVIN backend')
-        return {'status': 'connected', 'message': 'Welcome to ALVIN!'}
-    
-    @socketio.on('disconnect')
-    def handle_disconnect():
-        print('🔌 Client disconnected from ALVIN backend')
-    
-    @socketio.on('test_message')
-    def handle_test_message(data):
-        print(f'📨 Received test message: {data}')
-        return {'status': 'received', 'echo': data}
-    
-    # ============================================================================
-    # ERROR HANDLERS
-    # ============================================================================
-    
-    @app.errorhandler(404)
-    def not_found(error):
-        return jsonify({
-            'error': 'Not found',
-            'message': 'The requested resource was not found',
-            'available_endpoints': {
-                'home': '/',
-                'health': '/health',
-                'api_info': '/api',
-                'demo': '/demo',
-                'test': '/api/test'
-            }
-        }), 404
-    
-    @app.errorhandler(500)
-    def internal_server_error(error):
-        return jsonify({
-            'error': 'Internal server error',
-            'message': 'An unexpected error occurred'
-        }), 500
-    
-    # ============================================================================
-    # STARTUP MESSAGE
-    # ============================================================================
-    
-    print("=" * 60)
-    print("🎭 ALVIN Backend Started Successfully!")
-    print("🌐 API available at: http://localhost:5000")
-    print("🩺 Health check: http://localhost:5000/health")
-    print("📋 API info: http://localhost:5000/api")
-    print("🎪 Demo info: http://localhost:5000/demo") 
-    print("🔌 Socket.IO ready for real-time features")
-    print("=" * 60)
     
     return app
+
+def register_blueprints(app):
+    """Register application blueprints"""
+    try:
+        from app.routes.auth import auth_bp
+        from app.routes.projects import projects_bp
+        from app.routes.ai import ai_bp
+        
+        app.register_blueprint(auth_bp, url_prefix='/api/auth')
+        app.register_blueprint(projects_bp, url_prefix='/api/projects')
+        app.register_blueprint(ai_bp, url_prefix='/api/ai')
+        
+    except ImportError as e:
+        # If blueprints don't exist yet, continue without them
+        print(f"Warning: Could not import blueprints: {e}")
+        pass

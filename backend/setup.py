@@ -105,16 +105,20 @@ def setup_database():
     print("\n🗄️ Setting up database...")
     
     try:
-        # Import after potential dependency installation
-        from app import create_app, db
-        from app.models import User, Project, Scene, StoryObject, BillingPlan, UserSubscription
-        
-        # Set environment for database setup
+        # Set environment for database setup first
         os.environ['FLASK_CONFIG'] = 'development'
         
+        # Import app factory
+        from app import create_app, db
+        
+        # Create app instance
         app = create_app('development')
         
+        # Import models only within app context
         with app.app_context():
+            # Import models after app context is created
+            from app.models import User, Project, Scene, StoryObject, BillingPlan, UserSubscription
+            
             print("   Creating database tables...")
             db.create_all()
             
@@ -135,6 +139,8 @@ def setup_database():
         sys.exit(1)
     except Exception as e:
         print(f"❌ Database setup failed: {e}")
+        import traceback
+        traceback.print_exc()
         sys.exit(1)
 
 def create_default_billing_plans(db):
