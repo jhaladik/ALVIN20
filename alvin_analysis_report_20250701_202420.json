@@ -1,0 +1,1266 @@
+{
+  "test_summary": {
+    "duration_seconds": 55.631635,
+    "total_users_simulated": 5,
+    "successful_users": 5,
+    "test_start_time": "2025-07-01T20:23:24.682075",
+    "test_end_time": "2025-07-01T20:24:20.313710"
+  },
+  "performance_analysis": {
+    "total_requests": 110,
+    "avg_response_time": 0.5824114539406516,
+    "median_response_time": 0.0820995569229126,
+    "min_response_time": 0.01645064353942871,
+    "max_response_time": 50.732046127319336,
+    "p95_response_time": 0.570121455192566,
+    "p99_response_time": 45.22048851966858
+  },
+  "error_analysis": {
+    "total_errors": 20,
+    "error_rate": 18.181818181818183,
+    "status_code_distribution": {
+      "200": 51,
+      "201": 39,
+      "404": 5,
+      "500": 5,
+      "400": 5,
+      "401": 5
+    },
+    "common_errors": {
+      "The requested resource was not found": 5,
+      "Unable to get project": 5,
+      "Project title is required": 5,
+      "Authorization token is required": 5
+    }
+  },
+  "endpoint_analysis": {
+    "/health": {
+      "count": 1,
+      "total_time": 50.732046127319336,
+      "errors": 0,
+      "avg_response_size": 212.0,
+      "avg_response_time": 50.732046127319336,
+      "error_rate": 0.0
+    },
+    "/api/auth/register": {
+      "count": 5,
+      "total_time": 2.907623052597046,
+      "errors": 0,
+      "avg_response_size": 800.0,
+      "avg_response_time": 0.5815246105194092,
+      "error_rate": 0.0
+    },
+    "/api/auth/login": {
+      "count": 5,
+      "total_time": 2.6305694580078125,
+      "errors": 0,
+      "avg_response_size": 946.0,
+      "avg_response_time": 0.5261138916015625,
+      "error_rate": 0.0
+    },
+    "/api/ai/analyze-idea": {
+      "count": 5,
+      "total_time": 0.36096930503845215,
+      "errors": 0,
+      "avg_response_size": 744.6,
+      "avg_response_time": 0.07219386100769043,
+      "error_rate": 0.0
+    },
+    "/api/ai/create-project-from-idea": {
+      "count": 5,
+      "total_time": 0.5173254013061523,
+      "errors": 0,
+      "avg_response_size": 614.0,
+      "avg_response_time": 0.10346508026123047,
+      "error_rate": 0.0
+    },
+    "/api/ai/projects/15/analyze-structure": {
+      "count": 1,
+      "total_time": 0.03221392631530762,
+      "errors": 0,
+      "avg_response_size": 2240.0,
+      "avg_response_time": 0.03221392631530762,
+      "error_rate": 0.0
+    },
+    "/api/ai/projects/12/analyze-structure": {
+      "count": 1,
+      "total_time": 0.036740779876708984,
+      "errors": 0,
+      "avg_response_size": 2242.0,
+      "avg_response_time": 0.036740779876708984,
+      "error_rate": 0.0
+    },
+    "/api/ai/projects/14/analyze-structure": {
+      "count": 1,
+      "total_time": 0.04712557792663574,
+      "errors": 0,
+      "avg_response_size": 2239.0,
+      "avg_response_time": 0.04712557792663574,
+      "error_rate": 0.0
+    },
+    "/api/ai/projects/11/analyze-structure": {
+      "count": 1,
+      "total_time": 0.05811452865600586,
+      "errors": 0,
+      "avg_response_size": 2239.0,
+      "avg_response_time": 0.05811452865600586,
+      "error_rate": 0.0
+    },
+    "/api/ai/projects/13/analyze-structure": {
+      "count": 1,
+      "total_time": 0.07262039184570312,
+      "errors": 0,
+      "avg_response_size": 2242.0,
+      "avg_response_time": 0.07262039184570312,
+      "error_rate": 0.0
+    },
+    "/api/ai/projects/15/suggest-scenes": {
+      "count": 1,
+      "total_time": 0.04210519790649414,
+      "errors": 0,
+      "avg_response_size": 1550.0,
+      "avg_response_time": 0.04210519790649414,
+      "error_rate": 0.0
+    },
+    "/api/ai/projects/12/suggest-scenes": {
+      "count": 1,
+      "total_time": 0.043877601623535156,
+      "errors": 0,
+      "avg_response_size": 1552.0,
+      "avg_response_time": 0.043877601623535156,
+      "error_rate": 0.0
+    },
+    "/api/ai/projects/14/suggest-scenes": {
+      "count": 1,
+      "total_time": 0.04331636428833008,
+      "errors": 0,
+      "avg_response_size": 1549.0,
+      "avg_response_time": 0.04331636428833008,
+      "error_rate": 0.0
+    },
+    "/api/ai/projects/11/suggest-scenes": {
+      "count": 1,
+      "total_time": 0.03515458106994629,
+      "errors": 0,
+      "avg_response_size": 1549.0,
+      "avg_response_time": 0.03515458106994629,
+      "error_rate": 0.0
+    },
+    "/api/ai/projects/13/suggest-scenes": {
+      "count": 1,
+      "total_time": 0.021248340606689453,
+      "errors": 0,
+      "avg_response_size": 1552.0,
+      "avg_response_time": 0.021248340606689453,
+      "error_rate": 0.0
+    },
+    "/api/projects": {
+      "count": 20,
+      "total_time": 1.427560567855835,
+      "errors": 10,
+      "avg_response_size": 296.6,
+      "avg_response_time": 0.07137802839279175,
+      "error_rate": 50.0
+    },
+    "/api/projects/16": {
+      "count": 2,
+      "total_time": 0.1745772361755371,
+      "errors": 0,
+      "avg_response_size": 501.0,
+      "avg_response_time": 0.08728861808776855,
+      "error_rate": 0.0
+    },
+    "/api/projects/17": {
+      "count": 2,
+      "total_time": 0.18262147903442383,
+      "errors": 0,
+      "avg_response_size": 500.0,
+      "avg_response_time": 0.09131073951721191,
+      "error_rate": 0.0
+    },
+    "/api/projects/19": {
+      "count": 2,
+      "total_time": 0.14844155311584473,
+      "errors": 0,
+      "avg_response_size": 496.0,
+      "avg_response_time": 0.07422077655792236,
+      "error_rate": 0.0
+    },
+    "/api/projects/18": {
+      "count": 2,
+      "total_time": 0.14647603034973145,
+      "errors": 0,
+      "avg_response_size": 502.0,
+      "avg_response_time": 0.07323801517486572,
+      "error_rate": 0.0
+    },
+    "/api/projects/20": {
+      "count": 2,
+      "total_time": 0.13578581809997559,
+      "errors": 0,
+      "avg_response_size": 498.0,
+      "avg_response_time": 0.06789290904998779,
+      "error_rate": 0.0
+    },
+    "/api/scenes": {
+      "count": 24,
+      "total_time": 2.4757003784179688,
+      "errors": 0,
+      "avg_response_size": 1468.0,
+      "avg_response_time": 0.10315418243408203,
+      "error_rate": 0.0
+    },
+    "/api/scenes?project_id=12": {
+      "count": 1,
+      "total_time": 0.059072256088256836,
+      "errors": 0,
+      "avg_response_size": 3872.0,
+      "avg_response_time": 0.059072256088256836,
+      "error_rate": 0.0
+    },
+    "/api/scenes?project_id=14": {
+      "count": 1,
+      "total_time": 0.08249282836914062,
+      "errors": 0,
+      "avg_response_size": 6142.0,
+      "avg_response_time": 0.08249282836914062,
+      "error_rate": 0.0
+    },
+    "/api/scenes?project_id=13": {
+      "count": 1,
+      "total_time": 0.061452627182006836,
+      "errors": 0,
+      "avg_response_size": 6591.0,
+      "avg_response_time": 0.061452627182006836,
+      "error_rate": 0.0
+    },
+    "/api/scenes?project_id=11": {
+      "count": 1,
+      "total_time": 0.0647432804107666,
+      "errors": 0,
+      "avg_response_size": 8474.0,
+      "avg_response_time": 0.0647432804107666,
+      "error_rate": 0.0
+    },
+    "/api/scenes/5": {
+      "count": 1,
+      "total_time": 0.0833735466003418,
+      "errors": 0,
+      "avg_response_size": 489.0,
+      "avg_response_time": 0.0833735466003418,
+      "error_rate": 0.0
+    },
+    "/api/scenes/1": {
+      "count": 1,
+      "total_time": 0.08693909645080566,
+      "errors": 0,
+      "avg_response_size": 488.0,
+      "avg_response_time": 0.08693909645080566,
+      "error_rate": 0.0
+    },
+    "/api/scenes/4": {
+      "count": 1,
+      "total_time": 0.09704065322875977,
+      "errors": 0,
+      "avg_response_size": 486.0,
+      "avg_response_time": 0.09704065322875977,
+      "error_rate": 0.0
+    },
+    "/api/scenes?project_id=15": {
+      "count": 1,
+      "total_time": 0.03608202934265137,
+      "errors": 0,
+      "avg_response_size": 9680.0,
+      "avg_response_time": 0.03608202934265137,
+      "error_rate": 0.0
+    },
+    "/api/scenes/3": {
+      "count": 1,
+      "total_time": 0.04568982124328613,
+      "errors": 0,
+      "avg_response_size": 484.0,
+      "avg_response_time": 0.04568982124328613,
+      "error_rate": 0.0
+    },
+    "/api/scenes/2": {
+      "count": 1,
+      "total_time": 0.026409149169921875,
+      "errors": 0,
+      "avg_response_size": 490.0,
+      "avg_response_time": 0.026409149169921875,
+      "error_rate": 0.0
+    },
+    "/api/analytics/dashboard": {
+      "count": 5,
+      "total_time": 0.6007444858551025,
+      "errors": 0,
+      "avg_response_size": 585.0,
+      "avg_response_time": 0.12014889717102051,
+      "error_rate": 0.0
+    },
+    "/api/nonexistent": {
+      "count": 5,
+      "total_time": 0.23909211158752441,
+      "errors": 5,
+      "avg_response_size": 268.0,
+      "avg_response_time": 0.04781842231750488,
+      "error_rate": 100.0
+    },
+    "/api/projects/5988a028-12d2-4845-8398-0f4569ed3981": {
+      "count": 1,
+      "total_time": 0.052893877029418945,
+      "errors": 1,
+      "avg_response_size": 41.0,
+      "avg_response_time": 0.052893877029418945,
+      "error_rate": 100.0
+    },
+    "/api/projects/ed1a1b33-dab4-4600-902a-832e7039f162": {
+      "count": 1,
+      "total_time": 0.056346893310546875,
+      "errors": 1,
+      "avg_response_size": 41.0,
+      "avg_response_time": 0.056346893310546875,
+      "error_rate": 100.0
+    },
+    "/api/projects/06fde503-7de5-4815-895b-4822ef79d3e3": {
+      "count": 1,
+      "total_time": 0.0650320053100586,
+      "errors": 1,
+      "avg_response_size": 41.0,
+      "avg_response_time": 0.0650320053100586,
+      "error_rate": 100.0
+    },
+    "/api/projects/e5c1f05a-fd8b-483a-a45e-e0209e6eed80": {
+      "count": 1,
+      "total_time": 0.06717514991760254,
+      "errors": 1,
+      "avg_response_size": 41.0,
+      "avg_response_time": 0.06717514991760254,
+      "error_rate": 100.0
+    },
+    "/api/projects/7e2efb78-d036-416c-b2f5-4691b9d76232": {
+      "count": 1,
+      "total_time": 0.0684664249420166,
+      "errors": 1,
+      "avg_response_size": 41.0,
+      "avg_response_time": 0.0684664249420166,
+      "error_rate": 100.0
+    }
+  },
+  "resource_analysis": {
+    "avg_cpu_usage": 28.84,
+    "max_cpu_usage": 51.1,
+    "avg_memory_usage": 87.08,
+    "max_memory_usage": 88.8
+  },
+  "recommendations": [
+    "\u274c HIGH ERROR RATE: 18.2% error rate is concerning. Review error logs and implement better error handling.",
+    "\ud83d\udc0c SLOW ENDPOINTS: ['/health'] are consistently slow. Consider optimizing these specific operations.",
+    "\ud83d\udca5 ERROR-PRONE ENDPOINTS: ['/api/projects', '/api/nonexistent', '/api/projects/5988a028-12d2-4845-8398-0f4569ed3981', '/api/projects/ed1a1b33-dab4-4600-902a-832e7039f162', '/api/projects/06fde503-7de5-4815-895b-4822ef79d3e3', '/api/projects/e5c1f05a-fd8b-483a-a45e-e0209e6eed80', '/api/projects/7e2efb78-d036-416c-b2f5-4691b9d76232'] have high error rates. Review input validation and error handling.",
+    "\ud83e\udde0 HIGH MEMORY USAGE: Memory usage is high. Check for memory leaks and consider implementing memory-efficient data structures.",
+    "\ud83d\udd10 AUTHENTICATION ISSUES: Some requests are failing authentication. Review JWT token handling and session management.",
+    "\u2705 IMPLEMENT CACHING: Add Redis caching for frequently accessed data (user profiles, project metadata).",
+    "\u2705 ADD REQUEST LOGGING: Implement comprehensive request logging for better debugging and monitoring.",
+    "\u2705 IMPLEMENT RATE LIMITING: Add rate limiting to prevent abuse and improve stability.",
+    "\u2705 ADD HEALTH CHECKS: Implement detailed health checks for database, Redis, and AI services.",
+    "\u2705 OPTIMIZE MIDDLEWARE: Review and optimize middleware stack for performance.",
+    "\u2705 ADD MONITORING: Implement application performance monitoring (APM) for production insights."
+  ],
+  "detailed_user_results": [
+    {
+      "ai_operations": {
+        "idea_analysis": {
+          "success": true,
+          "response_time": 0.04712319374084473,
+          "data": {
+            "analysis": {
+              "character_development": 7.8,
+              "estimated_length": "Medium (50,000-80,000 words)",
+              "genre_suggestions": [
+                "Fantasy",
+                "Adventure"
+              ],
+              "originality_score": 8.2,
+              "plot_potential": 8.5,
+              "target_audience": "Young Adult",
+              "themes": [
+                "Coming of age",
+                "Good vs. evil",
+                "Friendship"
+              ]
+            },
+            "estimated_tokens_used": 1250,
+            "idea_text": "A social media influencer's followers start disappearing from real life whenever they unfollow online",
+            "simulation_mode": true,
+            "suggestions": [
+              "Consider developing the antagonist's motivation more deeply",
+              "Add supporting characters to enhance the world-building",
+              "Explore the magical system in more detail"
+            ]
+          }
+        },
+        "project_from_idea": {
+          "success": true,
+          "response_time": 0.1080172061920166,
+          "data": {
+            "message": "Project created from idea successfully",
+            "project": {
+              "created_at": "2025-07-01T18:24:16.713637",
+              "current_word_count": 0,
+              "description": "A social media influencer's followers start disappearing from real life whenever they unfollow online",
+              "expected_length": "medium",
+              "genre": "Fantasy",
+              "id": 11,
+              "object_count": 0,
+              "scene_count": 0,
+              "status": "active",
+              "target_audience": "Young Adult",
+              "target_word_count": null,
+              "title": "Backwards Village",
+              "updated_at": "2025-07-01T18:24:16.713642",
+              "user_id": 27
+            },
+            "simulation_mode": true
+          }
+        },
+        "structure_analysis": {
+          "success": true,
+          "response_time": 0.05811452865600586
+        },
+        "scene_suggestions": {
+          "success": true,
+          "response_time": 0.03515458106994629
+        }
+      },
+      "project_operations": {
+        "list_projects": {
+          "success": true,
+          "response_time": 0.10241246223449707,
+          "count": 1
+        },
+        "create_project": {
+          "success": true,
+          "response_time": 0.09437823295593262,
+          "data": {
+            "message": "Project created successfully",
+            "project": {
+              "created_at": "2025-07-01T18:24:17.577249",
+              "current_word_count": 0,
+              "description": "A test project created during simulation",
+              "expected_length": "short",
+              "genre": "Fantasy",
+              "id": 19,
+              "object_count": 0,
+              "scene_count": 0,
+              "status": "active",
+              "target_audience": "Adult",
+              "target_word_count": null,
+              "title": "Test Project df68cece",
+              "updated_at": "2025-07-01T18:24:17.577256",
+              "user_id": 27
+            }
+          }
+        },
+        "get_project": {
+          "success": true,
+          "response_time": 0.06673526763916016
+        },
+        "update_project": {
+          "success": true,
+          "response_time": 0.08170628547668457
+        }
+      },
+      "scene_operations": {
+        "create_scenes": {
+          "success": true,
+          "count": 5,
+          "avg_response_time": 0.10936737060546875
+        },
+        "list_scenes": {
+          "success": true,
+          "response_time": 0.0647432804107666,
+          "count": 5
+        },
+        "update_scene": {
+          "success": true,
+          "response_time": 0.04568982124328613
+        }
+      },
+      "analytics": {
+        "dashboard": {
+          "success": true,
+          "response_time": 0.11689949035644531,
+          "data": {
+            "recent_activity": [
+              {
+                "description": "You have 2 active projects",
+                "timestamp": "2025-07-01T18:24:19.550873",
+                "title": "Recent Project Activity",
+                "type": "project_created"
+              }
+            ],
+            "user_stats": {
+              "account_age_days": 0,
+              "active_projects": 2,
+              "completed_projects": 0,
+              "tokens_remaining": 1000,
+              "tokens_used": 0,
+              "total_projects": 2,
+              "total_words_written": 0
+            },
+            "writing_progress": {
+              "average_words_per_project": 0,
+              "most_productive_genre": "Fantasy",
+              "words_this_month": 0,
+              "words_this_week": 0
+            }
+          }
+        }
+      },
+      "error_handling": {
+        "invalid_endpoint": {
+          "returns_404": true,
+          "response_time": 0.028957605361938477
+        },
+        "invalid_project": {
+          "returns_404": false,
+          "response_time": 0.052893877029418945
+        },
+        "malformed_data": {
+          "returns_400": true,
+          "response_time": 0.036443233489990234
+        },
+        "unauthorized": {
+          "returns_401": true,
+          "response_time": 0.026004314422607422
+        }
+      },
+      "session_summary": {
+        "user_id": "sim_user_0_00c4780b",
+        "email": "test_user_sim_user_0_00c4780b@alvin-test.com",
+        "total_operations": 20,
+        "successful_operations": 16,
+        "failed_operations": 4,
+        "success_rate": 80.0,
+        "projects_created": 2,
+        "scenes_created": 5
+      }
+    },
+    {
+      "ai_operations": {
+        "idea_analysis": {
+          "success": true,
+          "response_time": 0.10739731788635254,
+          "data": {
+            "analysis": {
+              "character_development": 7.8,
+              "estimated_length": "Medium (50,000-80,000 words)",
+              "genre_suggestions": [
+                "Fantasy",
+                "Adventure"
+              ],
+              "originality_score": 8.2,
+              "plot_potential": 8.5,
+              "target_audience": "Young Adult",
+              "themes": [
+                "Coming of age",
+                "Good vs. evil",
+                "Friendship"
+              ]
+            },
+            "estimated_tokens_used": 1250,
+            "idea_text": "A detective discovers that the serial killer they're hunting is actually their future self from a parallel timeline",
+            "simulation_mode": true,
+            "suggestions": [
+              "Consider developing the antagonist's motivation more deeply",
+              "Add supporting characters to enhance the world-building",
+              "Explore the magical system in more detail"
+            ]
+          }
+        },
+        "project_from_idea": {
+          "success": true,
+          "response_time": 0.09920120239257812,
+          "data": {
+            "message": "Project created from idea successfully",
+            "project": {
+              "created_at": "2025-07-01T18:24:16.750310",
+              "current_word_count": 0,
+              "description": "A detective discovers that the serial killer they're hunting is actually their future self from a parallel timeline",
+              "expected_length": "medium",
+              "genre": "Fantasy",
+              "id": 14,
+              "object_count": 0,
+              "scene_count": 0,
+              "status": "active",
+              "target_audience": "Young Adult",
+              "target_word_count": null,
+              "title": "Backwards Village",
+              "updated_at": "2025-07-01T18:24:16.750315",
+              "user_id": 24
+            },
+            "simulation_mode": true
+          }
+        },
+        "structure_analysis": {
+          "success": true,
+          "response_time": 0.04712557792663574
+        },
+        "scene_suggestions": {
+          "success": true,
+          "response_time": 0.04331636428833008
+        }
+      },
+      "project_operations": {
+        "list_projects": {
+          "success": true,
+          "response_time": 0.08028411865234375,
+          "count": 1
+        },
+        "create_project": {
+          "success": true,
+          "response_time": 0.08771228790283203,
+          "data": {
+            "message": "Project created successfully",
+            "project": {
+              "created_at": "2025-07-01T18:24:17.516726",
+              "current_word_count": 0,
+              "description": "A test project created during simulation",
+              "expected_length": "long",
+              "genre": "Romance",
+              "id": 16,
+              "object_count": 0,
+              "scene_count": 0,
+              "status": "active",
+              "target_audience": "Young Adult",
+              "target_word_count": null,
+              "title": "Test Project 5ffd4fc5",
+              "updated_at": "2025-07-01T18:24:17.516735",
+              "user_id": 24
+            }
+          }
+        },
+        "get_project": {
+          "success": true,
+          "response_time": 0.07942962646484375
+        },
+        "update_project": {
+          "success": true,
+          "response_time": 0.09514760971069336
+        }
+      },
+      "scene_operations": {
+        "create_scenes": {
+          "success": true,
+          "count": 4,
+          "avg_response_time": 0.13804477453231812
+        },
+        "list_scenes": {
+          "success": true,
+          "response_time": 0.08249282836914062,
+          "count": 4
+        },
+        "update_scene": {
+          "success": true,
+          "response_time": 0.08693909645080566
+        }
+      },
+      "analytics": {
+        "dashboard": {
+          "success": true,
+          "response_time": 0.11998701095581055,
+          "data": {
+            "recent_activity": [
+              {
+                "description": "You have 2 active projects",
+                "timestamp": "2025-07-01T18:24:19.533976",
+                "title": "Recent Project Activity",
+                "type": "project_created"
+              }
+            ],
+            "user_stats": {
+              "account_age_days": 0,
+              "active_projects": 2,
+              "completed_projects": 0,
+              "tokens_remaining": 1000,
+              "tokens_used": 0,
+              "total_projects": 2,
+              "total_words_written": 0
+            },
+            "writing_progress": {
+              "average_words_per_project": 0,
+              "most_productive_genre": "Fantasy",
+              "words_this_month": 0,
+              "words_this_week": 0
+            }
+          }
+        }
+      },
+      "error_handling": {
+        "invalid_endpoint": {
+          "returns_404": true,
+          "response_time": 0.0678110122680664
+        },
+        "invalid_project": {
+          "returns_404": false,
+          "response_time": 0.056346893310546875
+        },
+        "malformed_data": {
+          "returns_400": true,
+          "response_time": 0.05414295196533203
+        },
+        "unauthorized": {
+          "returns_401": true,
+          "response_time": 0.01645064353942871
+        }
+      },
+      "session_summary": {
+        "user_id": "sim_user_1_d1826570",
+        "email": "test_user_sim_user_1_d1826570@alvin-test.com",
+        "total_operations": 19,
+        "successful_operations": 15,
+        "failed_operations": 4,
+        "success_rate": 78.94736842105263,
+        "projects_created": 2,
+        "scenes_created": 4
+      }
+    },
+    {
+      "ai_operations": {
+        "idea_analysis": {
+          "success": true,
+          "response_time": 0.07880663871765137,
+          "data": {
+            "analysis": {
+              "character_development": 7.8,
+              "estimated_length": "Medium (50,000-80,000 words)",
+              "genre_suggestions": [
+                "Fantasy",
+                "Adventure"
+              ],
+              "originality_score": 8.2,
+              "plot_potential": 8.5,
+              "target_audience": "Young Adult",
+              "themes": [
+                "Coming of age",
+                "Good vs. evil",
+                "Friendship"
+              ]
+            },
+            "estimated_tokens_used": 1250,
+            "idea_text": "Time moves backwards in a small village, and only the newcomer remembers how things used to be",
+            "simulation_mode": true,
+            "suggestions": [
+              "Consider developing the antagonist's motivation more deeply",
+              "Add supporting characters to enhance the world-building",
+              "Explore the magical system in more detail"
+            ]
+          }
+        },
+        "project_from_idea": {
+          "success": true,
+          "response_time": 0.10071372985839844,
+          "data": {
+            "message": "Project created from idea successfully",
+            "project": {
+              "created_at": "2025-07-01T18:24:16.759000",
+              "current_word_count": 0,
+              "description": "Time moves backwards in a small village, and only the newcomer remembers how things used to be",
+              "expected_length": "medium",
+              "genre": "Fantasy",
+              "id": 15,
+              "object_count": 0,
+              "scene_count": 0,
+              "status": "active",
+              "target_audience": "Young Adult",
+              "target_word_count": null,
+              "title": "The Living Library",
+              "updated_at": "2025-07-01T18:24:16.759005",
+              "user_id": 26
+            },
+            "simulation_mode": true
+          }
+        },
+        "structure_analysis": {
+          "success": true,
+          "response_time": 0.03221392631530762
+        },
+        "scene_suggestions": {
+          "success": true,
+          "response_time": 0.04210519790649414
+        }
+      },
+      "project_operations": {
+        "list_projects": {
+          "success": true,
+          "response_time": 0.13257551193237305,
+          "count": 1
+        },
+        "create_project": {
+          "success": true,
+          "response_time": 0.11480426788330078,
+          "data": {
+            "message": "Project created successfully",
+            "project": {
+              "created_at": "2025-07-01T18:24:17.557591",
+              "current_word_count": 0,
+              "description": "A test project created during simulation",
+              "expected_length": "short",
+              "genre": "Romance",
+              "id": 18,
+              "object_count": 0,
+              "scene_count": 0,
+              "status": "active",
+              "target_audience": "Young Adult",
+              "target_word_count": null,
+              "title": "Test Project b65dad85",
+              "updated_at": "2025-07-01T18:24:17.557597",
+              "user_id": 26
+            }
+          }
+        },
+        "get_project": {
+          "success": true,
+          "response_time": 0.07039999961853027
+        },
+        "update_project": {
+          "success": true,
+          "response_time": 0.07607603073120117
+        }
+      },
+      "scene_operations": {
+        "create_scenes": {
+          "success": true,
+          "count": 6,
+          "avg_response_time": 0.0719216267267863
+        },
+        "list_scenes": {
+          "success": true,
+          "response_time": 0.03608202934265137,
+          "count": 6
+        },
+        "update_scene": {
+          "success": true,
+          "response_time": 0.026409149169921875
+        }
+      },
+      "analytics": {
+        "dashboard": {
+          "success": true,
+          "response_time": 0.10436701774597168,
+          "data": {
+            "recent_activity": [
+              {
+                "description": "You have 2 active projects",
+                "timestamp": "2025-07-01T18:24:19.565558",
+                "title": "Recent Project Activity",
+                "type": "project_created"
+              }
+            ],
+            "user_stats": {
+              "account_age_days": 0,
+              "active_projects": 2,
+              "completed_projects": 0,
+              "tokens_remaining": 1000,
+              "tokens_used": 0,
+              "total_projects": 2,
+              "total_words_written": 0
+            },
+            "writing_progress": {
+              "average_words_per_project": 0,
+              "most_productive_genre": "Fantasy",
+              "words_this_month": 0,
+              "words_this_week": 0
+            }
+          }
+        }
+      },
+      "error_handling": {
+        "invalid_endpoint": {
+          "returns_404": true,
+          "response_time": 0.03364086151123047
+        },
+        "invalid_project": {
+          "returns_404": false,
+          "response_time": 0.0650320053100586
+        },
+        "malformed_data": {
+          "returns_400": true,
+          "response_time": 0.04590296745300293
+        },
+        "unauthorized": {
+          "returns_401": true,
+          "response_time": 0.02766561508178711
+        }
+      },
+      "session_summary": {
+        "user_id": "sim_user_2_889e9729",
+        "email": "test_user_sim_user_2_889e9729@alvin-test.com",
+        "total_operations": 21,
+        "successful_operations": 17,
+        "failed_operations": 4,
+        "success_rate": 80.95238095238095,
+        "projects_created": 2,
+        "scenes_created": 6
+      }
+    },
+    {
+      "ai_operations": {
+        "idea_analysis": {
+          "success": true,
+          "response_time": 0.08535051345825195,
+          "data": {
+            "analysis": {
+              "character_development": 7.8,
+              "estimated_length": "Medium (50,000-80,000 words)",
+              "genre_suggestions": [
+                "Fantasy",
+                "Adventure"
+              ],
+              "originality_score": 8.2,
+              "plot_potential": 8.5,
+              "target_audience": "Young Adult",
+              "themes": [
+                "Coming of age",
+                "Good vs. evil",
+                "Friendship"
+              ]
+            },
+            "estimated_tokens_used": 1250,
+            "idea_text": "Time moves backwards in a small village, and only the newcomer remembers how things used to be",
+            "simulation_mode": true,
+            "suggestions": [
+              "Consider developing the antagonist's motivation more deeply",
+              "Add supporting characters to enhance the world-building",
+              "Explore the magical system in more detail"
+            ]
+          }
+        },
+        "project_from_idea": {
+          "success": true,
+          "response_time": 0.10602927207946777,
+          "data": {
+            "message": "Project created from idea successfully",
+            "project": {
+              "created_at": "2025-07-01T18:24:16.727537",
+              "current_word_count": 0,
+              "description": "Time moves backwards in a small village, and only the newcomer remembers how things used to be",
+              "expected_length": "medium",
+              "genre": "Fantasy",
+              "id": 12,
+              "object_count": 0,
+              "scene_count": 0,
+              "status": "active",
+              "target_audience": "Young Adult",
+              "target_word_count": null,
+              "title": "The Enchanted Bakery",
+              "updated_at": "2025-07-01T18:24:16.727542",
+              "user_id": 28
+            },
+            "simulation_mode": true
+          }
+        },
+        "structure_analysis": {
+          "success": true,
+          "response_time": 0.036740779876708984
+        },
+        "scene_suggestions": {
+          "success": true,
+          "response_time": 0.043877601623535156
+        }
+      },
+      "project_operations": {
+        "list_projects": {
+          "success": true,
+          "response_time": 0.14168095588684082,
+          "count": 1
+        },
+        "create_project": {
+          "success": true,
+          "response_time": 0.11513662338256836,
+          "data": {
+            "message": "Project created successfully",
+            "project": {
+              "created_at": "2025-07-01T18:24:17.595992",
+              "current_word_count": 0,
+              "description": "A test project created during simulation",
+              "expected_length": "long",
+              "genre": "Mystery",
+              "id": 20,
+              "object_count": 0,
+              "scene_count": 0,
+              "status": "active",
+              "target_audience": "Children",
+              "target_word_count": null,
+              "title": "Test Project 4b107b7c",
+              "updated_at": "2025-07-01T18:24:17.595999",
+              "user_id": 28
+            }
+          }
+        },
+        "get_project": {
+          "success": true,
+          "response_time": 0.08004403114318848
+        },
+        "update_project": {
+          "success": true,
+          "response_time": 0.05574178695678711
+        }
+      },
+      "scene_operations": {
+        "create_scenes": {
+          "success": true,
+          "count": 4,
+          "avg_response_time": 0.16774648427963257
+        },
+        "list_scenes": {
+          "success": true,
+          "response_time": 0.059072256088256836,
+          "count": 4
+        },
+        "update_scene": {
+          "success": true,
+          "response_time": 0.0833735466003418
+        }
+      },
+      "analytics": {
+        "dashboard": {
+          "success": true,
+          "response_time": 0.13454890251159668,
+          "data": {
+            "recent_activity": [
+              {
+                "description": "You have 2 active projects",
+                "timestamp": "2025-07-01T18:24:19.543153",
+                "title": "Recent Project Activity",
+                "type": "project_created"
+              }
+            ],
+            "user_stats": {
+              "account_age_days": 0,
+              "active_projects": 2,
+              "completed_projects": 0,
+              "tokens_remaining": 1000,
+              "tokens_used": 0,
+              "total_projects": 2,
+              "total_words_written": 0
+            },
+            "writing_progress": {
+              "average_words_per_project": 0,
+              "most_productive_genre": "Fantasy",
+              "words_this_month": 0,
+              "words_this_week": 0
+            }
+          }
+        }
+      },
+      "error_handling": {
+        "invalid_endpoint": {
+          "returns_404": true,
+          "response_time": 0.060173988342285156
+        },
+        "invalid_project": {
+          "returns_404": false,
+          "response_time": 0.06717514991760254
+        },
+        "malformed_data": {
+          "returns_400": true,
+          "response_time": 0.059823036193847656
+        },
+        "unauthorized": {
+          "returns_401": true,
+          "response_time": 0.03659558296203613
+        }
+      },
+      "session_summary": {
+        "user_id": "sim_user_3_e50bb1fc",
+        "email": "test_user_sim_user_3_e50bb1fc@alvin-test.com",
+        "total_operations": 19,
+        "successful_operations": 15,
+        "failed_operations": 4,
+        "success_rate": 78.94736842105263,
+        "projects_created": 2,
+        "scenes_created": 4
+      }
+    },
+    {
+      "ai_operations": {
+        "idea_analysis": {
+          "success": true,
+          "response_time": 0.04229164123535156,
+          "data": {
+            "analysis": {
+              "character_development": 7.8,
+              "estimated_length": "Medium (50,000-80,000 words)",
+              "genre_suggestions": [
+                "Fantasy",
+                "Adventure"
+              ],
+              "originality_score": 8.2,
+              "plot_potential": 8.5,
+              "target_audience": "Young Adult",
+              "themes": [
+                "Coming of age",
+                "Good vs. evil",
+                "Friendship"
+              ]
+            },
+            "estimated_tokens_used": 1250,
+            "idea_text": "A child's imaginary friend turns out to be a quantum physicist trapped between dimensions",
+            "simulation_mode": true,
+            "suggestions": [
+              "Consider developing the antagonist's motivation more deeply",
+              "Add supporting characters to enhance the world-building",
+              "Explore the magical system in more detail"
+            ]
+          }
+        },
+        "project_from_idea": {
+          "success": true,
+          "response_time": 0.1033639907836914,
+          "data": {
+            "message": "Project created from idea successfully",
+            "project": {
+              "created_at": "2025-07-01T18:24:16.738334",
+              "current_word_count": 0,
+              "description": "A child's imaginary friend turns out to be a quantum physicist trapped between dimensions",
+              "expected_length": "medium",
+              "genre": "Fantasy",
+              "id": 13,
+              "object_count": 0,
+              "scene_count": 0,
+              "status": "active",
+              "target_audience": "Young Adult",
+              "target_word_count": null,
+              "title": "Courthouse Creatures",
+              "updated_at": "2025-07-01T18:24:16.738339",
+              "user_id": 25
+            },
+            "simulation_mode": true
+          }
+        },
+        "structure_analysis": {
+          "success": true,
+          "response_time": 0.07262039184570312
+        },
+        "scene_suggestions": {
+          "success": true,
+          "response_time": 0.021248340606689453
+        }
+      },
+      "project_operations": {
+        "list_projects": {
+          "success": true,
+          "response_time": 0.09006834030151367,
+          "count": 1
+        },
+        "create_project": {
+          "success": true,
+          "response_time": 0.07987833023071289,
+          "data": {
+            "message": "Project created successfully",
+            "project": {
+              "created_at": "2025-07-01T18:24:17.538585",
+              "current_word_count": 0,
+              "description": "A test project created during simulation",
+              "expected_length": "medium",
+              "genre": "Fantasy",
+              "id": 17,
+              "object_count": 0,
+              "scene_count": 0,
+              "status": "active",
+              "target_audience": "Children",
+              "target_word_count": null,
+              "title": "Test Project 370de45f",
+              "updated_at": "2025-07-01T18:24:17.538639",
+              "user_id": 25
+            }
+          }
+        },
+        "get_project": {
+          "success": true,
+          "response_time": 0.08265423774719238
+        },
+        "update_project": {
+          "success": true,
+          "response_time": 0.09996724128723145
+        }
+      },
+      "scene_operations": {
+        "create_scenes": {
+          "success": true,
+          "count": 5,
+          "avg_response_time": 0.1629171371459961
+        },
+        "list_scenes": {
+          "success": true,
+          "response_time": 0.061452627182006836,
+          "count": 5
+        },
+        "update_scene": {
+          "success": true,
+          "response_time": 0.09704065322875977
+        }
+      },
+      "analytics": {
+        "dashboard": {
+          "success": true,
+          "response_time": 0.12494206428527832,
+          "data": {
+            "recent_activity": [
+              {
+                "description": "You have 2 active projects",
+                "timestamp": "2025-07-01T18:24:19.549389",
+                "title": "Recent Project Activity",
+                "type": "project_created"
+              }
+            ],
+            "user_stats": {
+              "account_age_days": 0,
+              "active_projects": 2,
+              "completed_projects": 0,
+              "tokens_remaining": 1000,
+              "tokens_used": 0,
+              "total_projects": 2,
+              "total_words_written": 0
+            },
+            "writing_progress": {
+              "average_words_per_project": 0,
+              "most_productive_genre": "Fantasy",
+              "words_this_month": 0,
+              "words_this_week": 0
+            }
+          }
+        }
+      },
+      "error_handling": {
+        "invalid_endpoint": {
+          "returns_404": true,
+          "response_time": 0.048508644104003906
+        },
+        "invalid_project": {
+          "returns_404": false,
+          "response_time": 0.0684664249420166
+        },
+        "malformed_data": {
+          "returns_400": true,
+          "response_time": 0.05681347846984863
+        },
+        "unauthorized": {
+          "returns_401": true,
+          "response_time": 0.028787612915039062
+        }
+      },
+      "session_summary": {
+        "user_id": "sim_user_4_612bd3d4",
+        "email": "test_user_sim_user_4_612bd3d4@alvin-test.com",
+        "total_operations": 20,
+        "successful_operations": 16,
+        "failed_operations": 4,
+        "success_rate": 80.0,
+        "projects_created": 2,
+        "scenes_created": 5
+      }
+    }
+  ]
+}

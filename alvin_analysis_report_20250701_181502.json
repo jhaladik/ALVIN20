@@ -1,0 +1,88 @@
+{
+  "test_summary": {
+    "duration_seconds": 0.123952,
+    "total_users_simulated": 5,
+    "successful_users": 0,
+    "test_start_time": "2025-07-01T18:15:02.832603",
+    "test_end_time": "2025-07-01T18:15:02.956555"
+  },
+  "performance_analysis": {
+    "total_requests": 11,
+    "avg_response_time": 0.02858636595986106,
+    "median_response_time": 0.028905868530273438,
+    "min_response_time": 0.011756420135498047,
+    "max_response_time": 0.04566073417663574,
+    "p95_response_time": 0,
+    "p99_response_time": 0
+  },
+  "error_analysis": {
+    "total_errors": 10,
+    "error_rate": 90.9090909090909,
+    "status_code_distribution": {
+      "200": 1,
+      "400": 5,
+      "401": 5
+    },
+    "common_errors": {
+      "Please check your input": 5,
+      "Email or password is incorrect": 5
+    }
+  },
+  "endpoint_analysis": {
+    "/health": {
+      "count": 1,
+      "total_time": 0.011756420135498047,
+      "errors": 0,
+      "avg_response_size": 78.0,
+      "avg_response_time": 0.011756420135498047,
+      "error_rate": 0.0
+    },
+    "/api/auth/register": {
+      "count": 5,
+      "total_time": 0.11291360855102539,
+      "errors": 5,
+      "avg_response_size": 311.0,
+      "avg_response_time": 0.02258272171020508,
+      "error_rate": 100.0
+    },
+    "/api/auth/login": {
+      "count": 5,
+      "total_time": 0.18977999687194824,
+      "errors": 5,
+      "avg_response_size": 84.0,
+      "avg_response_time": 0.03795599937438965,
+      "error_rate": 100.0
+    }
+  },
+  "resource_analysis": {
+    "error": "No system metrics collected"
+  },
+  "recommendations": [
+    "\u274c HIGH ERROR RATE: 90.9% error rate is concerning. Review error logs and implement better error handling.",
+    "\ud83d\udca5 ERROR-PRONE ENDPOINTS: ['/api/auth/register', '/api/auth/login'] have high error rates. Review input validation and error handling.",
+    "\ud83d\udd10 AUTHENTICATION ISSUES: Some requests are failing authentication. Review JWT token handling and session management.",
+    "\u2705 IMPLEMENT CACHING: Add Redis caching for frequently accessed data (user profiles, project metadata).",
+    "\u2705 ADD REQUEST LOGGING: Implement comprehensive request logging for better debugging and monitoring.",
+    "\u2705 IMPLEMENT RATE LIMITING: Add rate limiting to prevent abuse and improve stability.",
+    "\u2705 ADD HEALTH CHECKS: Implement detailed health checks for database, Redis, and AI services.",
+    "\u2705 OPTIMIZE MIDDLEWARE: Review and optimize middleware stack for performance.",
+    "\u2705 ADD MONITORING: Implement application performance monitoring (APM) for production insights."
+  ],
+  "detailed_user_results": [
+    {
+      "error": "Failed to create user session"
+    },
+    {
+      "error": "Failed to create user session"
+    },
+    {
+      "error": "Failed to create user session"
+    },
+    {
+      "error": "Failed to create user session"
+    },
+    {
+      "error": "Failed to create user session"
+    }
+  ]
+}

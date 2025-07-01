@@ -1,0 +1,264 @@
+{
+  "test_summary": {
+    "duration_seconds": 2.962769,
+    "total_users_simulated": 5,
+    "successful_users": 1,
+    "test_start_time": "2025-07-01T18:15:29.017626",
+    "test_end_time": "2025-07-01T18:15:31.980395"
+  },
+  "performance_analysis": {
+    "total_requests": 25,
+    "avg_response_time": 0.08432013789812724,
+    "median_response_time": 0.008863687515258789,
+    "min_response_time": 0.0021195411682128906,
+    "max_response_time": 0.5282516479492188,
+    "p95_response_time": 0.5214787125587463,
+    "p99_response_time": 0
+  },
+  "error_analysis": {
+    "total_errors": 19,
+    "error_rate": 76.0,
+    "status_code_distribution": {
+      "200": 2,
+      "400": 3,
+      "401": 8,
+      "201": 4,
+      "404": 8
+    },
+    "common_errors": {
+      "Please check your input": 2,
+      "Email or password is incorrect": 4,
+      "The requested resource was not found": 5,
+      "Token is invalid or malformed": 3,
+      "Project title is required": 1,
+      "Please log in to access this resource": 1
+    }
+  },
+  "endpoint_analysis": {
+    "/health": {
+      "count": 1,
+      "total_time": 0.017069101333618164,
+      "errors": 0,
+      "avg_response_size": 78.0,
+      "avg_response_time": 0.017069101333618164,
+      "error_rate": 0.0
+    },
+    "/api/auth/register": {
+      "count": 5,
+      "total_time": 1.5695576667785645,
+      "errors": 2,
+      "avg_response_size": 590.6,
+      "avg_response_time": 0.31391153335571287,
+      "error_rate": 40.0
+    },
+    "/api/auth/login": {
+      "count": 5,
+      "total_time": 0.3418259620666504,
+      "errors": 4,
+      "avg_response_size": 218.8,
+      "avg_response_time": 0.06836519241333008,
+      "error_rate": 80.0
+    },
+    "/api/ai/analyze-idea": {
+      "count": 1,
+      "total_time": 0.003076314926147461,
+      "errors": 1,
+      "avg_response_size": 268.0,
+      "avg_response_time": 0.003076314926147461,
+      "error_rate": 100.0
+    },
+    "/api/projects": {
+      "count": 4,
+      "total_time": 0.0543520450592041,
+      "errors": 3,
+      "avg_response_size": 185.0,
+      "avg_response_time": 0.013588011264801025,
+      "error_rate": 75.0
+    },
+    "/api/projects/1": {
+      "count": 2,
+      "total_time": 0.006947517395019531,
+      "errors": 2,
+      "avg_response_size": 172.5,
+      "avg_response_time": 0.0034737586975097656,
+      "error_rate": 100.0
+    },
+    "/api/scenes": {
+      "count": 3,
+      "total_time": 0.014746904373168945,
+      "errors": 3,
+      "avg_response_size": 227.33333333333334,
+      "avg_response_time": 0.004915634791056315,
+      "error_rate": 100.0
+    },
+    "/api/scenes?project_id=1": {
+      "count": 1,
+      "total_time": 0.0031347274780273438,
+      "errors": 1,
+      "avg_response_size": 268.0,
+      "avg_response_time": 0.0031347274780273438,
+      "error_rate": 100.0
+    },
+    "/api/analytics/dashboard": {
+      "count": 1,
+      "total_time": 0.004025459289550781,
+      "errors": 1,
+      "avg_response_size": 207.0,
+      "avg_response_time": 0.004025459289550781,
+      "error_rate": 100.0
+    },
+    "/api/nonexistent": {
+      "count": 1,
+      "total_time": 0.0,
+      "errors": 1,
+      "avg_response_size": 268.0,
+      "avg_response_time": 0.0,
+      "error_rate": 100.0
+    },
+    "/api/projects/f5f49df3-5d49-4544-ac39-eecf3867d171": {
+      "count": 1,
+      "total_time": 0.008947610855102539,
+      "errors": 1,
+      "avg_response_size": 77.0,
+      "avg_response_time": 0.008947610855102539,
+      "error_rate": 100.0
+    }
+  },
+  "resource_analysis": {
+    "avg_cpu_usage": 47.2,
+    "max_cpu_usage": 47.2,
+    "avg_memory_usage": 87.8,
+    "max_memory_usage": 87.8
+  },
+  "recommendations": [
+    "\u274c HIGH ERROR RATE: 76.0% error rate is concerning. Review error logs and implement better error handling.",
+    "\ud83d\udca5 ERROR-PRONE ENDPOINTS: ['/api/auth/register', '/api/auth/login', '/api/ai/analyze-idea', '/api/projects', '/api/projects/1', '/api/scenes', '/api/scenes?project_id=1', '/api/analytics/dashboard', '/api/nonexistent', '/api/projects/f5f49df3-5d49-4544-ac39-eecf3867d171'] have high error rates. Review input validation and error handling.",
+    "\ud83e\udde0 HIGH MEMORY USAGE: Memory usage is high. Check for memory leaks and consider implementing memory-efficient data structures.",
+    "\ud83d\udd10 AUTHENTICATION ISSUES: Some requests are failing authentication. Review JWT token handling and session management.",
+    "\u2705 IMPLEMENT CACHING: Add Redis caching for frequently accessed data (user profiles, project metadata).",
+    "\u2705 ADD REQUEST LOGGING: Implement comprehensive request logging for better debugging and monitoring.",
+    "\u2705 IMPLEMENT RATE LIMITING: Add rate limiting to prevent abuse and improve stability.",
+    "\u2705 ADD HEALTH CHECKS: Implement detailed health checks for database, Redis, and AI services.",
+    "\u2705 OPTIMIZE MIDDLEWARE: Review and optimize middleware stack for performance.",
+    "\u2705 ADD MONITORING: Implement application performance monitoring (APM) for production insights."
+  ],
+  "detailed_user_results": [
+    {
+      "error": "Failed to create user session"
+    },
+    {
+      "error": "Failed to create user session"
+    },
+    {
+      "error": "Failed to create user session"
+    },
+    {
+      "error": "Failed to create user session"
+    },
+    {
+      "ai_operations": {
+        "idea_analysis": {
+          "success": false,
+          "response_time": 0.003076314926147461,
+          "data": {
+            "available_endpoints": {
+              "api_info": "/api",
+              "demo": "/demo",
+              "health": "/health",
+              "home": "/",
+              "login": "/api/auth/login",
+              "register": "/api/auth/register"
+            },
+            "error": "Not found",
+            "message": "The requested resource was not found"
+          }
+        }
+      },
+      "project_operations": {
+        "list_projects": {
+          "success": false,
+          "response_time": 0.0053441524505615234,
+          "count": 0
+        },
+        "create_project": {
+          "success": true,
+          "response_time": 0.030086517333984375,
+          "data": {
+            "message": "Project created successfully",
+            "project": {
+              "created_at": "2025-07-01T16:15:30.389024",
+              "current_word_count": 0,
+              "description": "A test project created during simulation",
+              "expected_length": "short",
+              "genre": "Romance",
+              "id": 1,
+              "object_count": 0,
+              "scene_count": 0,
+              "status": "active",
+              "target_audience": "Young Adult",
+              "target_word_count": null,
+              "title": "Test Project e8cef480",
+              "updated_at": "2025-07-01T16:15:30.389024",
+              "user_id": 3
+            }
+          }
+        },
+        "get_project": {
+          "success": false,
+          "response_time": 0.004319906234741211
+        },
+        "update_project": {
+          "success": false,
+          "response_time": 0.0026276111602783203
+        }
+      },
+      "scene_operations": {
+        "create_scenes": {
+          "success": false,
+          "count": 0,
+          "avg_response_time": 0.004915634791056315
+        },
+        "list_scenes": {
+          "success": false,
+          "response_time": 0.0031347274780273438,
+          "count": 0
+        }
+      },
+      "analytics": {
+        "dashboard": {
+          "success": false,
+          "response_time": 0.004025459289550781,
+          "data": null
+        }
+      },
+      "error_handling": {
+        "invalid_endpoint": {
+          "returns_404": true,
+          "response_time": 0.0
+        },
+        "invalid_project": {
+          "returns_404": false,
+          "response_time": 0.008947610855102539
+        },
+        "malformed_data": {
+          "returns_400": true,
+          "response_time": 0.003148794174194336
+        },
+        "unauthorized": {
+          "returns_401": true,
+          "response_time": 0.015772581100463867
+        }
+      },
+      "session_summary": {
+        "user_id": "sim_user_4_094ad60f",
+        "email": "test_user_sim_user_4_094ad60f@alvin-test.com",
+        "total_operations": 14,
+        "successful_operations": 1,
+        "failed_operations": 13,
+        "success_rate": 7.142857142857142,
+        "projects_created": 1,
+        "scenes_created": 0
+      }
+    }
+  ]
+}

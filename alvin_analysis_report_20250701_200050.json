@@ -1,0 +1,434 @@
+{
+  "test_summary": {
+    "duration_seconds": 6.933808,
+    "total_users_simulated": 5,
+    "successful_users": 3,
+    "test_start_time": "2025-07-01T20:00:43.160265",
+    "test_end_time": "2025-07-01T20:00:50.094073"
+  },
+  "performance_analysis": {
+    "total_requests": 37,
+    "avg_response_time": 0.5003944345422693,
+    "median_response_time": 0.013698339462280273,
+    "min_response_time": 0.003591775894165039,
+    "max_response_time": 3.807044744491577,
+    "p95_response_time": 3.7681475639343263,
+    "p99_response_time": 0
+  },
+  "error_analysis": {
+    "total_errors": 23,
+    "error_rate": 62.16216216216216,
+    "status_code_distribution": {
+      "200": 9,
+      "201": 5,
+      "401": 18,
+      "404": 4,
+      "400": 1
+    },
+    "common_errors": {
+      "Invalid token": 13,
+      "Email or password is incorrect": 2,
+      "The requested resource was not found": 3,
+      "Authorization token is required": 3,
+      "Project not found": 1,
+      "Project title is required": 1
+    }
+  },
+  "endpoint_analysis": {
+    "/health": {
+      "count": 1,
+      "total_time": 0.04647994041442871,
+      "errors": 0,
+      "avg_response_size": 212.0,
+      "avg_response_time": 0.04647994041442871,
+      "error_rate": 0.0
+    },
+    "/api/auth/register": {
+      "count": 5,
+      "total_time": 12.499024868011475,
+      "errors": 0,
+      "avg_response_size": 796.4,
+      "avg_response_time": 2.499804973602295,
+      "error_rate": 0.0
+    },
+    "/api/auth/login": {
+      "count": 5,
+      "total_time": 4.32506537437439,
+      "errors": 2,
+      "avg_response_size": 585.4,
+      "avg_response_time": 0.8650130748748779,
+      "error_rate": 40.0
+    },
+    "/api/ai/analyze-idea": {
+      "count": 3,
+      "total_time": 0.03166818618774414,
+      "errors": 1,
+      "avg_response_size": 526.0,
+      "avg_response_time": 0.01055606206258138,
+      "error_rate": 33.33333333333333
+    },
+    "/api/projects": {
+      "count": 12,
+      "total_time": 1.4578790664672852,
+      "errors": 10,
+      "avg_response_size": 62.083333333333336,
+      "avg_response_time": 0.1214899222056071,
+      "error_rate": 83.33333333333334
+    },
+    "/api/analytics/dashboard": {
+      "count": 3,
+      "total_time": 0.0684506893157959,
+      "errors": 2,
+      "avg_response_size": 250.0,
+      "avg_response_time": 0.022816896438598633,
+      "error_rate": 66.66666666666666
+    },
+    "/api/nonexistent": {
+      "count": 3,
+      "total_time": 0.02662944793701172,
+      "errors": 3,
+      "avg_response_size": 268.0,
+      "avg_response_time": 0.008876482645670572,
+      "error_rate": 100.0
+    },
+    "/api/projects/dae696cf-c959-43f5-a284-8e5d232c9b9e": {
+      "count": 1,
+      "total_time": 0.013207197189331055,
+      "errors": 1,
+      "avg_response_size": 80.0,
+      "avg_response_time": 0.013207197189331055,
+      "error_rate": 100.0
+    },
+    "/api/ai/create-project-from-idea": {
+      "count": 2,
+      "total_time": 0.021305561065673828,
+      "errors": 2,
+      "avg_response_size": 85.0,
+      "avg_response_time": 0.010652780532836914,
+      "error_rate": 100.0
+    },
+    "/api/projects/5347895e-2b82-43e8-889b-48a673a52360": {
+      "count": 1,
+      "total_time": 0.009029865264892578,
+      "errors": 1,
+      "avg_response_size": 85.0,
+      "avg_response_time": 0.009029865264892578,
+      "error_rate": 100.0
+    },
+    "/api/projects/a9d4613f-1d8c-4321-a566-97f1402e94a5": {
+      "count": 1,
+      "total_time": 0.0158538818359375,
+      "errors": 1,
+      "avg_response_size": 37.0,
+      "avg_response_time": 0.0158538818359375,
+      "error_rate": 100.0
+    }
+  },
+  "resource_analysis": {
+    "avg_cpu_usage": 62.1,
+    "max_cpu_usage": 62.1,
+    "avg_memory_usage": 90.4,
+    "max_memory_usage": 90.4
+  },
+  "recommendations": [
+    "\u26a0\ufe0f SLOW TAIL LATENCY: 95th percentile response time is high. This suggests some requests are significantly slower - investigate database queries and AI API calls.",
+    "\u274c HIGH ERROR RATE: 62.2% error rate is concerning. Review error logs and implement better error handling.",
+    "\ud83d\udc0c SLOW ENDPOINTS: ['/api/auth/register'] are consistently slow. Consider optimizing these specific operations.",
+    "\ud83d\udca5 ERROR-PRONE ENDPOINTS: ['/api/auth/login', '/api/ai/analyze-idea', '/api/projects', '/api/analytics/dashboard', '/api/nonexistent', '/api/projects/dae696cf-c959-43f5-a284-8e5d232c9b9e', '/api/ai/create-project-from-idea', '/api/projects/5347895e-2b82-43e8-889b-48a673a52360', '/api/projects/a9d4613f-1d8c-4321-a566-97f1402e94a5'] have high error rates. Review input validation and error handling.",
+    "\ud83e\udde0 HIGH MEMORY USAGE: Memory usage is high. Check for memory leaks and consider implementing memory-efficient data structures.",
+    "\ud83d\udd10 AUTHENTICATION ISSUES: Some requests are failing authentication. Review JWT token handling and session management.",
+    "\u2705 IMPLEMENT CACHING: Add Redis caching for frequently accessed data (user profiles, project metadata).",
+    "\u2705 ADD REQUEST LOGGING: Implement comprehensive request logging for better debugging and monitoring.",
+    "\u2705 IMPLEMENT RATE LIMITING: Add rate limiting to prevent abuse and improve stability.",
+    "\u2705 ADD HEALTH CHECKS: Implement detailed health checks for database, Redis, and AI services.",
+    "\u2705 OPTIMIZE MIDDLEWARE: Review and optimize middleware stack for performance.",
+    "\u2705 ADD MONITORING: Implement application performance monitoring (APM) for production insights."
+  ],
+  "detailed_user_results": [
+    {
+      "ai_operations": {
+        "idea_analysis": {
+          "success": true,
+          "response_time": 0.010216951370239258,
+          "data": {
+            "analysis": {
+              "character_development": 7.8,
+              "estimated_length": "Medium (50,000-80,000 words)",
+              "genre_suggestions": [
+                "Fantasy",
+                "Adventure"
+              ],
+              "originality_score": 8.2,
+              "plot_potential": 8.5,
+              "target_audience": "Young Adult",
+              "themes": [
+                "Coming of age",
+                "Good vs. evil",
+                "Friendship"
+              ]
+            },
+            "estimated_tokens_used": 1250,
+            "idea_text": "In a world where memories can be extracted and sold, a memory thief finds a memory that doesn't belong to anyone",
+            "simulation_mode": true,
+            "suggestions": [
+              "Consider developing the antagonist's motivation more deeply",
+              "Add supporting characters to enhance the world-building",
+              "Explore the magical system in more detail"
+            ]
+          }
+        },
+        "project_from_idea": {
+          "success": false,
+          "response_time": 0.012365579605102539,
+          "data": {
+            "error_details": "Signature verification failed",
+            "message": "Invalid token"
+          }
+        }
+      },
+      "project_operations": {
+        "list_projects": {
+          "success": true,
+          "response_time": 0.03263497352600098,
+          "count": 0
+        },
+        "create_project": {
+          "success": false,
+          "response_time": 0.018254756927490234,
+          "data": {
+            "error_details": "Signature verification failed",
+            "message": "Invalid token"
+          }
+        }
+      },
+      "scene_operations": {
+        "error": "No projects available for scene testing"
+      },
+      "analytics": {
+        "dashboard": {
+          "success": true,
+          "response_time": 0.048647403717041016,
+          "data": {
+            "recent_activity": [
+              {
+                "description": "You have 0 active projects",
+                "timestamp": "2025-07-01T18:00:49.514455",
+                "title": "Recent Project Activity",
+                "type": "project_created"
+              }
+            ],
+            "user_stats": {
+              "account_age_days": 0,
+              "active_projects": 0,
+              "completed_projects": 0,
+              "tokens_remaining": 1000,
+              "tokens_used": 0,
+              "total_projects": 0,
+              "total_words_written": 0
+            },
+            "writing_progress": {
+              "average_words_per_project": 0,
+              "most_productive_genre": "Fantasy",
+              "words_this_month": 0,
+              "words_this_week": 0
+            }
+          }
+        }
+      },
+      "error_handling": {
+        "invalid_endpoint": {
+          "returns_404": true,
+          "response_time": 0.008993148803710938
+        },
+        "invalid_project": {
+          "returns_404": false,
+          "response_time": 0.009029865264892578
+        },
+        "malformed_data": {
+          "returns_400": true,
+          "response_time": 0.011919975280761719
+        },
+        "unauthorized": {
+          "returns_401": true,
+          "response_time": 0.007029533386230469
+        }
+      },
+      "session_summary": {
+        "user_id": "sim_user_0_d84760ee",
+        "email": "test_user_sim_user_0_d84760ee@alvin-test.com",
+        "total_operations": 9,
+        "successful_operations": 3,
+        "failed_operations": 6,
+        "success_rate": 33.33333333333333,
+        "projects_created": 0,
+        "scenes_created": 0
+      }
+    },
+    {
+      "ai_operations": {
+        "idea_analysis": {
+          "success": false,
+          "response_time": 0.011043548583984375,
+          "data": {
+            "error_details": "Subject must be a string",
+            "message": "Invalid token"
+          }
+        }
+      },
+      "project_operations": {
+        "list_projects": {
+          "success": false,
+          "response_time": 1.2990736961364746,
+          "count": 0
+        },
+        "create_project": {
+          "success": false,
+          "response_time": 0.02465987205505371,
+          "data": {
+            "error_details": "Subject must be a string",
+            "message": "Invalid token"
+          }
+        }
+      },
+      "scene_operations": {
+        "error": "No projects available for scene testing"
+      },
+      "analytics": {
+        "dashboard": {
+          "success": false,
+          "response_time": 0.009821414947509766,
+          "data": null
+        }
+      },
+      "error_handling": {
+        "invalid_endpoint": {
+          "returns_404": true,
+          "response_time": 0.003591775894165039
+        },
+        "invalid_project": {
+          "returns_404": false,
+          "response_time": 0.013207197189331055
+        },
+        "malformed_data": {
+          "returns_400": false,
+          "response_time": 0.007208347320556641
+        },
+        "unauthorized": {
+          "returns_401": true,
+          "response_time": 0.007982254028320312
+        }
+      },
+      "session_summary": {
+        "user_id": "sim_user_1_e4809acc",
+        "email": "test_user_sim_user_1_e4809acc@alvin-test.com",
+        "total_operations": 8,
+        "successful_operations": 0,
+        "failed_operations": 8,
+        "success_rate": 0.0,
+        "projects_created": 0,
+        "scenes_created": 0
+      }
+    },
+    {
+      "ai_operations": {
+        "idea_analysis": {
+          "success": true,
+          "response_time": 0.010407686233520508,
+          "data": {
+            "analysis": {
+              "character_development": 7.8,
+              "estimated_length": "Medium (50,000-80,000 words)",
+              "genre_suggestions": [
+                "Fantasy",
+                "Adventure"
+              ],
+              "originality_score": 8.2,
+              "plot_potential": 8.5,
+              "target_audience": "Young Adult",
+              "themes": [
+                "Coming of age",
+                "Good vs. evil",
+                "Friendship"
+              ]
+            },
+            "estimated_tokens_used": 1250,
+            "idea_text": "Time moves backwards in a small village, and only the newcomer remembers how things used to be",
+            "simulation_mode": true,
+            "suggestions": [
+              "Consider developing the antagonist's motivation more deeply",
+              "Add supporting characters to enhance the world-building",
+              "Explore the magical system in more detail"
+            ]
+          }
+        },
+        "project_from_idea": {
+          "success": false,
+          "response_time": 0.008939981460571289,
+          "data": {
+            "error_details": "Signature verification failed",
+            "message": "Invalid token"
+          }
+        }
+      },
+      "project_operations": {
+        "list_projects": {
+          "success": true,
+          "response_time": 0.013698339462280273,
+          "count": 0
+        },
+        "create_project": {
+          "success": false,
+          "response_time": 0.011770009994506836,
+          "data": {
+            "error_details": "Signature verification failed",
+            "message": "Invalid token"
+          }
+        }
+      },
+      "scene_operations": {
+        "error": "No projects available for scene testing"
+      },
+      "analytics": {
+        "dashboard": {
+          "success": false,
+          "response_time": 0.009981870651245117,
+          "data": null
+        }
+      },
+      "error_handling": {
+        "invalid_endpoint": {
+          "returns_404": true,
+          "response_time": 0.014044523239135742
+        },
+        "invalid_project": {
+          "returns_404": true,
+          "response_time": 0.0158538818359375
+        },
+        "malformed_data": {
+          "returns_400": false,
+          "response_time": 0.011402606964111328
+        },
+        "unauthorized": {
+          "returns_401": true,
+          "response_time": 0.012244701385498047
+        }
+      },
+      "session_summary": {
+        "user_id": "sim_user_2_87b6dfff",
+        "email": "test_user_sim_user_2_87b6dfff@alvin-test.com",
+        "total_operations": 9,
+        "successful_operations": 2,
+        "failed_operations": 7,
+        "success_rate": 22.22222222222222,
+        "projects_created": 0,
+        "scenes_created": 0
+      }
+    },
+    {
+      "error": "Failed to create user session"
+    },
+    {
+      "error": "Failed to create user session"
+    }
+  ]
+}

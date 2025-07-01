@@ -1,0 +1,511 @@
+{
+  "test_summary": {
+    "duration_seconds": 3.107554,
+    "total_users_simulated": 5,
+    "successful_users": 5,
+    "test_start_time": "2025-07-01T18:20:54.200415",
+    "test_end_time": "2025-07-01T18:20:57.307969"
+  },
+  "performance_analysis": {
+    "total_requests": 51,
+    "avg_response_time": 0.0794822935964547,
+    "median_response_time": 0.019725322723388672,
+    "min_response_time": 0.004717111587524414,
+    "max_response_time": 0.3365151882171631,
+    "p95_response_time": 0.3227830410003662,
+    "p99_response_time": 0
+  },
+  "error_analysis": {
+    "total_errors": 40,
+    "error_rate": 78.43137254901961,
+    "status_code_distribution": {
+      "200": 6,
+      "201": 5,
+      "404": 20,
+      "401": 20
+    },
+    "common_errors": {
+      "The requested resource was not found": 20,
+      "Invalid token": 15,
+      "Authorization token is required": 5
+    }
+  },
+  "endpoint_analysis": {
+    "/health": {
+      "count": 1,
+      "total_time": 0.023123979568481445,
+      "errors": 0,
+      "avg_response_size": 212.0,
+      "avg_response_time": 0.023123979568481445,
+      "error_rate": 0.0
+    },
+    "/api/auth/register": {
+      "count": 5,
+      "total_time": 1.5214555263519287,
+      "errors": 0,
+      "avg_response_size": 777.0,
+      "avg_response_time": 0.3042911052703857,
+      "error_rate": 0.0
+    },
+    "/api/auth/login": {
+      "count": 5,
+      "total_time": 1.593113899230957,
+      "errors": 0,
+      "avg_response_size": 792.0,
+      "avg_response_time": 0.3186227798461914,
+      "error_rate": 0.0
+    },
+    "/api/ai/analyze-idea": {
+      "count": 5,
+      "total_time": 0.296283483505249,
+      "errors": 5,
+      "avg_response_size": 268.0,
+      "avg_response_time": 0.059256696701049806,
+      "error_rate": 100.0
+    },
+    "/api/projects": {
+      "count": 20,
+      "total_time": 0.38581323623657227,
+      "errors": 20,
+      "avg_response_size": 37.5,
+      "avg_response_time": 0.019290661811828612,
+      "error_rate": 100.0
+    },
+    "/api/analytics/dashboard": {
+      "count": 5,
+      "total_time": 0.06881928443908691,
+      "errors": 5,
+      "avg_response_size": 268.0,
+      "avg_response_time": 0.013763856887817384,
+      "error_rate": 100.0
+    },
+    "/api/nonexistent": {
+      "count": 5,
+      "total_time": 0.09684300422668457,
+      "errors": 5,
+      "avg_response_size": 268.0,
+      "avg_response_time": 0.019368600845336915,
+      "error_rate": 100.0
+    },
+    "/api/projects/33b3ce74-eae4-43f5-8908-f463c8cc5f18": {
+      "count": 1,
+      "total_time": 0.007783174514770508,
+      "errors": 1,
+      "avg_response_size": 268.0,
+      "avg_response_time": 0.007783174514770508,
+      "error_rate": 100.0
+    },
+    "/api/projects/ec470e24-3ead-4aaf-8790-478807fc5183": {
+      "count": 1,
+      "total_time": 0.009903192520141602,
+      "errors": 1,
+      "avg_response_size": 268.0,
+      "avg_response_time": 0.009903192520141602,
+      "error_rate": 100.0
+    },
+    "/api/projects/ee78ef79-c252-4474-a00b-395dfdfb628b": {
+      "count": 1,
+      "total_time": 0.018330812454223633,
+      "errors": 1,
+      "avg_response_size": 268.0,
+      "avg_response_time": 0.018330812454223633,
+      "error_rate": 100.0
+    },
+    "/api/projects/974b7365-ade1-4b2e-8c58-521253ab2e76": {
+      "count": 1,
+      "total_time": 0.02051258087158203,
+      "errors": 1,
+      "avg_response_size": 268.0,
+      "avg_response_time": 0.02051258087158203,
+      "error_rate": 100.0
+    },
+    "/api/projects/1b78e5f2-4742-415b-8b9d-60d9be81ab94": {
+      "count": 1,
+      "total_time": 0.011614799499511719,
+      "errors": 1,
+      "avg_response_size": 268.0,
+      "avg_response_time": 0.011614799499511719,
+      "error_rate": 100.0
+    }
+  },
+  "resource_analysis": {
+    "avg_cpu_usage": 46.6,
+    "max_cpu_usage": 46.6,
+    "avg_memory_usage": 90.2,
+    "max_memory_usage": 90.2
+  },
+  "recommendations": [
+    "\u274c HIGH ERROR RATE: 78.4% error rate is concerning. Review error logs and implement better error handling.",
+    "\ud83d\udca5 ERROR-PRONE ENDPOINTS: ['/api/ai/analyze-idea', '/api/projects', '/api/analytics/dashboard', '/api/nonexistent', '/api/projects/33b3ce74-eae4-43f5-8908-f463c8cc5f18', '/api/projects/ec470e24-3ead-4aaf-8790-478807fc5183', '/api/projects/ee78ef79-c252-4474-a00b-395dfdfb628b', '/api/projects/974b7365-ade1-4b2e-8c58-521253ab2e76', '/api/projects/1b78e5f2-4742-415b-8b9d-60d9be81ab94'] have high error rates. Review input validation and error handling.",
+    "\ud83e\udde0 HIGH MEMORY USAGE: Memory usage is high. Check for memory leaks and consider implementing memory-efficient data structures.",
+    "\ud83d\udd10 AUTHENTICATION ISSUES: Some requests are failing authentication. Review JWT token handling and session management.",
+    "\u2705 IMPLEMENT CACHING: Add Redis caching for frequently accessed data (user profiles, project metadata).",
+    "\u2705 ADD REQUEST LOGGING: Implement comprehensive request logging for better debugging and monitoring.",
+    "\u2705 IMPLEMENT RATE LIMITING: Add rate limiting to prevent abuse and improve stability.",
+    "\u2705 ADD HEALTH CHECKS: Implement detailed health checks for database, Redis, and AI services.",
+    "\u2705 OPTIMIZE MIDDLEWARE: Review and optimize middleware stack for performance.",
+    "\u2705 ADD MONITORING: Implement application performance monitoring (APM) for production insights."
+  ],
+  "detailed_user_results": [
+    {
+      "ai_operations": {
+        "idea_analysis": {
+          "success": false,
+          "response_time": 0.050187110900878906,
+          "data": {
+            "available_endpoints": {
+              "api_info": "/api",
+              "demo": "/demo",
+              "health": "/health",
+              "home": "/",
+              "login": "/api/auth/login",
+              "register": "/api/auth/register"
+            },
+            "error": "Not found",
+            "message": "The requested resource was not found"
+          }
+        }
+      },
+      "project_operations": {
+        "list_projects": {
+          "success": false,
+          "response_time": 0.03326749801635742,
+          "count": 0
+        },
+        "create_project": {
+          "success": false,
+          "response_time": 0.018452882766723633,
+          "data": {
+            "message": "Invalid token"
+          }
+        }
+      },
+      "scene_operations": {
+        "error": "No projects available for scene testing"
+      },
+      "analytics": {
+        "dashboard": {
+          "success": false,
+          "response_time": 0.01005697250366211,
+          "data": null
+        }
+      },
+      "error_handling": {
+        "invalid_endpoint": {
+          "returns_404": true,
+          "response_time": 0.010219335556030273
+        },
+        "invalid_project": {
+          "returns_404": true,
+          "response_time": 0.009903192520141602
+        },
+        "malformed_data": {
+          "returns_400": false,
+          "response_time": 0.004777193069458008
+        },
+        "unauthorized": {
+          "returns_401": true,
+          "response_time": 0.008620738983154297
+        }
+      },
+      "session_summary": {
+        "user_id": "sim_user_0_3f22c17e",
+        "email": "test_user_sim_user_0_3f22c17e@alvin-test.com",
+        "total_operations": 8,
+        "successful_operations": 0,
+        "failed_operations": 8,
+        "success_rate": 0.0,
+        "projects_created": 0,
+        "scenes_created": 0
+      }
+    },
+    {
+      "ai_operations": {
+        "idea_analysis": {
+          "success": false,
+          "response_time": 0.047437429428100586,
+          "data": {
+            "available_endpoints": {
+              "api_info": "/api",
+              "demo": "/demo",
+              "health": "/health",
+              "home": "/",
+              "login": "/api/auth/login",
+              "register": "/api/auth/register"
+            },
+            "error": "Not found",
+            "message": "The requested resource was not found"
+          }
+        }
+      },
+      "project_operations": {
+        "list_projects": {
+          "success": false,
+          "response_time": 0.01850152015686035,
+          "count": 0
+        },
+        "create_project": {
+          "success": false,
+          "response_time": 0.016343116760253906,
+          "data": {
+            "message": "Invalid token"
+          }
+        }
+      },
+      "scene_operations": {
+        "error": "No projects available for scene testing"
+      },
+      "analytics": {
+        "dashboard": {
+          "success": false,
+          "response_time": 0.019725322723388672,
+          "data": null
+        }
+      },
+      "error_handling": {
+        "invalid_endpoint": {
+          "returns_404": true,
+          "response_time": 0.014014244079589844
+        },
+        "invalid_project": {
+          "returns_404": true,
+          "response_time": 0.018330812454223633
+        },
+        "malformed_data": {
+          "returns_400": false,
+          "response_time": 0.00979304313659668
+        },
+        "unauthorized": {
+          "returns_401": true,
+          "response_time": 0.05255770683288574
+        }
+      },
+      "session_summary": {
+        "user_id": "sim_user_1_2ab21053",
+        "email": "test_user_sim_user_1_2ab21053@alvin-test.com",
+        "total_operations": 8,
+        "successful_operations": 0,
+        "failed_operations": 8,
+        "success_rate": 0.0,
+        "projects_created": 0,
+        "scenes_created": 0
+      }
+    },
+    {
+      "ai_operations": {
+        "idea_analysis": {
+          "success": false,
+          "response_time": 0.05635714530944824,
+          "data": {
+            "available_endpoints": {
+              "api_info": "/api",
+              "demo": "/demo",
+              "health": "/health",
+              "home": "/",
+              "login": "/api/auth/login",
+              "register": "/api/auth/register"
+            },
+            "error": "Not found",
+            "message": "The requested resource was not found"
+          }
+        }
+      },
+      "project_operations": {
+        "list_projects": {
+          "success": false,
+          "response_time": 0.026279211044311523,
+          "count": 0
+        },
+        "create_project": {
+          "success": false,
+          "response_time": 0.019612550735473633,
+          "data": {
+            "message": "Invalid token"
+          }
+        }
+      },
+      "scene_operations": {
+        "error": "No projects available for scene testing"
+      },
+      "analytics": {
+        "dashboard": {
+          "success": false,
+          "response_time": 0.01683807373046875,
+          "data": null
+        }
+      },
+      "error_handling": {
+        "invalid_endpoint": {
+          "returns_404": true,
+          "response_time": 0.017620325088500977
+        },
+        "invalid_project": {
+          "returns_404": true,
+          "response_time": 0.02051258087158203
+        },
+        "malformed_data": {
+          "returns_400": false,
+          "response_time": 0.009217262268066406
+        },
+        "unauthorized": {
+          "returns_401": true,
+          "response_time": 0.011598587036132812
+        }
+      },
+      "session_summary": {
+        "user_id": "sim_user_2_97d214a6",
+        "email": "test_user_sim_user_2_97d214a6@alvin-test.com",
+        "total_operations": 8,
+        "successful_operations": 0,
+        "failed_operations": 8,
+        "success_rate": 0.0,
+        "projects_created": 0,
+        "scenes_created": 0
+      }
+    },
+    {
+      "ai_operations": {
+        "idea_analysis": {
+          "success": false,
+          "response_time": 0.06399083137512207,
+          "data": {
+            "available_endpoints": {
+              "api_info": "/api",
+              "demo": "/demo",
+              "health": "/health",
+              "home": "/",
+              "login": "/api/auth/login",
+              "register": "/api/auth/register"
+            },
+            "error": "Not found",
+            "message": "The requested resource was not found"
+          }
+        }
+      },
+      "project_operations": {
+        "list_projects": {
+          "success": false,
+          "response_time": 0.020969629287719727,
+          "count": 0
+        },
+        "create_project": {
+          "success": false,
+          "response_time": 0.014367103576660156,
+          "data": {
+            "message": "Invalid token"
+          }
+        }
+      },
+      "scene_operations": {
+        "error": "No projects available for scene testing"
+      },
+      "analytics": {
+        "dashboard": {
+          "success": false,
+          "response_time": 0.014273405075073242,
+          "data": null
+        }
+      },
+      "error_handling": {
+        "invalid_endpoint": {
+          "returns_404": true,
+          "response_time": 0.016637563705444336
+        },
+        "invalid_project": {
+          "returns_404": true,
+          "response_time": 0.007783174514770508
+        },
+        "malformed_data": {
+          "returns_400": false,
+          "response_time": 0.01981377601623535
+        },
+        "unauthorized": {
+          "returns_401": true,
+          "response_time": 0.008407115936279297
+        }
+      },
+      "session_summary": {
+        "user_id": "sim_user_3_8531a460",
+        "email": "test_user_sim_user_3_8531a460@alvin-test.com",
+        "total_operations": 8,
+        "successful_operations": 0,
+        "failed_operations": 8,
+        "success_rate": 0.0,
+        "projects_created": 0,
+        "scenes_created": 0
+      }
+    },
+    {
+      "ai_operations": {
+        "idea_analysis": {
+          "success": false,
+          "response_time": 0.07831096649169922,
+          "data": {
+            "available_endpoints": {
+              "api_info": "/api",
+              "demo": "/demo",
+              "health": "/health",
+              "home": "/",
+              "login": "/api/auth/login",
+              "register": "/api/auth/register"
+            },
+            "error": "Not found",
+            "message": "The requested resource was not found"
+          }
+        }
+      },
+      "project_operations": {
+        "list_projects": {
+          "success": false,
+          "response_time": 0.026214122772216797,
+          "count": 0
+        },
+        "create_project": {
+          "success": false,
+          "response_time": 0.015018939971923828,
+          "data": {
+            "message": "Invalid token"
+          }
+        }
+      },
+      "scene_operations": {
+        "error": "No projects available for scene testing"
+      },
+      "analytics": {
+        "dashboard": {
+          "success": false,
+          "response_time": 0.00792551040649414,
+          "data": null
+        }
+      },
+      "error_handling": {
+        "invalid_endpoint": {
+          "returns_404": true,
+          "response_time": 0.03835153579711914
+        },
+        "invalid_project": {
+          "returns_404": true,
+          "response_time": 0.011614799499511719
+        },
+        "malformed_data": {
+          "returns_400": false,
+          "response_time": 0.04728412628173828
+        },
+        "unauthorized": {
+          "returns_401": true,
+          "response_time": 0.004717111587524414
+        }
+      },
+      "session_summary": {
+        "user_id": "sim_user_4_dd9d130f",
+        "email": "test_user_sim_user_4_dd9d130f@alvin-test.com",
+        "total_operations": 8,
+        "successful_operations": 0,
+        "failed_operations": 8,
+        "success_rate": 0.0,
+        "projects_created": 0,
+        "scenes_created": 0
+      }
+    }
+  ]
+}
