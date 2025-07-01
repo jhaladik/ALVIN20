@@ -1,0 +1,183 @@
+# docker-compose.yml - ALVIN Docker Configuration (Fixed)
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: alvin_postgres
+    environment:
+      POSTGRES_DB: alvin
+      POSTGRES_USER: alvin_user
+      POSTGRES_PASSWORD: alvin_password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backend/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U alvin_user -d alvin"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    networks:
+      - alvin_network
+
+  # Redis for Caching and Sessions
+  redis:
+    image: redis:7-alpine
+    container_name: alvin_redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    networks:
+      - alvin_network
+
+  # Flask Backend
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: alvin_backend
+    environment:
+      FLASK_CONFIG: production
+      DATABASE_URL: postgresql://alvin_user:alvin_password@postgres:5432/alvin
+      REDIS_URL: redis://redis:6379/0
+      SECRET_KEY: ${SECRET_KEY:-alvin-production-secret-change-me}
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY:-jwt-production-secret-change-me}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY}
+      STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET}
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:3000,https://alvin.ai}
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./backend/uploads:/app/uploads
+      - ./backend/logs:/app/logs
+      - ./backend/exports:/app/exports
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    networks:
+      - alvin_network
+    restart: unless-stopped
+
+  # React Frontend
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_API_URL: ${VITE_API_URL:-http://localhost:5000}
+        VITE_STRIPE_PUBLISHABLE_KEY: ${VITE_STRIPE_PUBLISHABLE_KEY}
+    container_name: alvin_frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    networks:
+      - alvin_network
+    restart: unless-stopped
+
+  # Nginx Reverse Proxy (Production)
+  nginx:
+    image: nginx:alpine
+    container_name: alvin_nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/ssl:/etc/nginx/ssl
+      - ./frontend/dist:/usr/share/nginx/html
+    depends_on:
+      - backend
+      - frontend
+    networks:
+      - alvin_network
+    restart: unless-stopped
+    profiles:
+      - production
+
+# Development override services
+  # Development Backend (with hot reload)
+  backend-dev:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.dev
+    container_name: alvin_backend_dev
+    environment:
+      FLASK_CONFIG: development
+      DATABASE_URL: postgresql://alvin_user:alvin_password@postgres:5432/alvin
+      REDIS_URL: redis://redis:6379/0
+      SECRET_KEY: alvin-dev-secret-key
+      JWT_SECRET_KEY: jwt-dev-secret-key
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+      AI_SIMULATION_MODE: ${AI_SIMULATION_MODE:-true}
+      PAYMENT_SIMULATION_MODE: ${PAYMENT_SIMULATION_MODE:-true}
+      DEBUG: "true"
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./backend:/app
+      - ./backend/uploads:/app/uploads
+      - ./backend/logs:/app/logs
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - alvin_network
+    profiles:
+      - development
+
+  # Development Frontend (with hot reload)
+  frontend-dev:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    container_name: alvin_frontend_dev
+    environment:
+      VITE_API_URL: http://localhost:5000
+      VITE_STRIPE_PUBLISHABLE_KEY: ${VITE_STRIPE_PUBLISHABLE_KEY}
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    depends_on:
+      - backend-dev
+    networks:
+      - alvin_network
+    profiles:
+      - development
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+
+networks:
+  alvin_network:
+    driver: bridge
