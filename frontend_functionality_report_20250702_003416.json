@@ -1,0 +1,110 @@
+{
+  "ui_component_analysis": {
+    "total_components": 43,
+    "component_categories": {
+      "ai": 3,
+      "analytics": 1,
+      "collaboration": 7,
+      "layout": 3,
+      "objects": 4,
+      "projects": 8,
+      "scenes": 6,
+      "story": 8,
+      "ui": 3
+    },
+    "key_components_found": [
+      "AnalyticsDashboard",
+      "ProjectCard",
+      "SceneContentEditor"
+    ],
+    "missing_critical_components": [
+      "AuthForm",
+      "Navigation"
+    ],
+    "tiptap_integration": {
+      "has_editor_content": true,
+      "has_use_editor": true,
+      "has_character_count": true,
+      "has_placeholder": true,
+      "properly_configured": true
+    }
+  },
+  "javascript_bundle_analysis": {
+    "total_dependencies": 76,
+    "production_dependencies": 38,
+    "dev_dependencies": 38,
+    "critical_deps_status": {
+      "react": {
+        "installed": true,
+        "version": ">=18.0.0"
+      },
+      "react-dom": {
+        "installed": true,
+        "version": ">=18.0.0"
+      },
+      "react-router-dom": {
+        "installed": true,
+        "version": "^6.20.1"
+      },
+      "axios": {
+        "installed": true,
+        "version": "^1.6.2"
+      },
+      "socket.io-client": {
+        "installed": true,
+        "version": "^4.7.4"
+      },
+      "@tiptap/react": {
+        "installed": true,
+        "version": "^2.23.1"
+      },
+      "react-beautiful-dnd": {
+        "installed": true,
+        "version": "^13.1.1"
+      }
+    },
+    "potential_issues": [
+      "Heavy dependency detected: lodash - consider alternatives"
+    ],
+    "bundle_optimization": {
+      "has_build_config": false,
+      "has_chunk_splitting": false,
+      "has_minification": false
+    }
+  },
+  "css_and_styling": {
+    "css_framework": "tailwindcss",
+    "css_files_count": 2,
+    "styling_approach": [
+      "utility-first"
+    ],
+    "responsive_design": true,
+    "theme_support": false
+  },
+  "accessibility_features": {
+    "semantic_html_usage": 0,
+    "aria_attributes": 4,
+    "alt_attributes": 2,
+    "accessibility_issues": [],
+    "accessibility_score": 1.6
+  },
+  "performance_metrics": {
+    "bundle_size_estimate": "medium (30-50 deps)",
+    "code_splitting": true,
+    "lazy_loading": true,
+    "optimization_opportunities": [
+      "Many useState hooks in CollaboratorsList.tsx - consider useReducer",
+      "Many useState hooks in Settings.tsx - consider useReducer",
+      "Many useState hooks in StoryPhase.tsx - consider useReducer"
+    ]
+  },
+  "mobile_responsiveness": {
+    "responsive_patterns": 86,
+    "mobile_specific_styles": 1,
+    "touch_friendly_elements": 352,
+    "viewport_configured": true,
+    "mobile_issues": [
+      "Potential horizontal scroll issue"
+    ]
+  }
+}

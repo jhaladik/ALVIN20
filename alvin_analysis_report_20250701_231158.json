@@ -1,0 +1,222 @@
+{
+  "test_summary": {
+    "duration_seconds": 3.879262,
+    "total_users_simulated": 5,
+    "successful_users": 1,
+    "test_start_time": "2025-07-01T23:11:54.557865",
+    "test_end_time": "2025-07-01T23:11:58.437127"
+  },
+  "performance_analysis": {
+    "total_requests": 19,
+    "avg_response_time": 0.1329815889659681,
+    "median_response_time": 0.015780925750732422,
+    "min_response_time": 0.0026388168334960938,
+    "max_response_time": 1.0214848518371582,
+    "p95_response_time": 0,
+    "p99_response_time": 0
+  },
+  "error_analysis": {
+    "total_errors": 13,
+    "error_rate": 68.42105263157895,
+    "status_code_distribution": {
+      "200": 4,
+      "400": 3,
+      "401": 5,
+      "201": 2,
+      "422": 3,
+      "404": 1,
+      "500": 1
+    },
+    "common_errors": {
+      "Email or password is incorrect": 2,
+      "The requested resource was not found": 1,
+      "Unable to get project": 1,
+      "Authorization token is required": 1
+    }
+  },
+  "endpoint_analysis": {
+    "/health": {
+      "count": 1,
+      "total_time": 0.20269083976745605,
+      "errors": 0,
+      "avg_response_size": 212.0,
+      "avg_response_time": 0.20269083976745605,
+      "error_rate": 0.0
+    },
+    "/api/auth/register": {
+      "count": 5,
+      "total_time": 0.7536969184875488,
+      "errors": 3,
+      "avg_response_size": 369.8,
+      "avg_response_time": 0.15073938369750978,
+      "error_rate": 60.0
+    },
+    "/api/auth/login": {
+      "count": 5,
+      "total_time": 0.47681307792663574,
+      "errors": 4,
+      "avg_response_size": 226.4,
+      "avg_response_time": 0.09536261558532715,
+      "error_rate": 80.0
+    },
+    "/api/ai/analyze-idea": {
+      "count": 1,
+      "total_time": 0.0026388168334960938,
+      "errors": 1,
+      "avg_response_size": 45.0,
+      "avg_response_time": 0.0026388168334960938,
+      "error_rate": 100.0
+    },
+    "/api/projects": {
+      "count": 4,
+      "total_time": 0.028566837310791016,
+      "errors": 3,
+      "avg_response_size": 40.5,
+      "avg_response_time": 0.007141709327697754,
+      "error_rate": 75.0
+    },
+    "/api/analytics/dashboard": {
+      "count": 1,
+      "total_time": 0.015780925750732422,
+      "errors": 0,
+      "avg_response_size": 585.0,
+      "avg_response_time": 0.015780925750732422,
+      "error_rate": 0.0
+    },
+    "/api/nonexistent": {
+      "count": 1,
+      "total_time": 1.0214848518371582,
+      "errors": 1,
+      "avg_response_size": 387.0,
+      "avg_response_time": 1.0214848518371582,
+      "error_rate": 100.0
+    },
+    "/api/projects/f6c8759d-5883-43d3-bc36-e10f8959408a": {
+      "count": 1,
+      "total_time": 0.024977922439575195,
+      "errors": 1,
+      "avg_response_size": 41.0,
+      "avg_response_time": 0.024977922439575195,
+      "error_rate": 100.0
+    }
+  },
+  "resource_analysis": {
+    "avg_cpu_usage": 23.8,
+    "max_cpu_usage": 23.8,
+    "avg_memory_usage": 86.8,
+    "max_memory_usage": 86.8
+  },
+  "recommendations": [
+    "\u274c HIGH ERROR RATE: 68.4% error rate is concerning. Review error logs and implement better error handling.",
+    "\ud83d\udca5 ERROR-PRONE ENDPOINTS: ['/api/auth/register', '/api/auth/login', '/api/ai/analyze-idea', '/api/projects', '/api/nonexistent', '/api/projects/f6c8759d-5883-43d3-bc36-e10f8959408a'] have high error rates. Review input validation and error handling.",
+    "\ud83e\udde0 HIGH MEMORY USAGE: Memory usage is high. Check for memory leaks and consider implementing memory-efficient data structures.",
+    "\ud83d\udd10 AUTHENTICATION ISSUES: Some requests are failing authentication. Review JWT token handling and session management.",
+    "\u2705 IMPLEMENT CACHING: Add Redis caching for frequently accessed data (user profiles, project metadata).",
+    "\u2705 ADD REQUEST LOGGING: Implement comprehensive request logging for better debugging and monitoring.",
+    "\u2705 IMPLEMENT RATE LIMITING: Add rate limiting to prevent abuse and improve stability.",
+    "\u2705 ADD HEALTH CHECKS: Implement detailed health checks for database, Redis, and AI services.",
+    "\u2705 OPTIMIZE MIDDLEWARE: Review and optimize middleware stack for performance.",
+    "\u2705 ADD MONITORING: Implement application performance monitoring (APM) for production insights."
+  ],
+  "detailed_user_results": [
+    {
+      "error": "Failed to create user session"
+    },
+    {
+      "error": "Failed to create user session"
+    },
+    {
+      "error": "Failed to create user session"
+    },
+    {
+      "ai_operations": {
+        "idea_analysis": {
+          "success": false,
+          "response_time": 0.0026388168334960938,
+          "data": {
+            "msg": "Signature verification failed"
+          }
+        }
+      },
+      "project_operations": {
+        "list_projects": {
+          "success": true,
+          "response_time": 0.016454458236694336,
+          "count": 0
+        },
+        "create_project": {
+          "success": false,
+          "response_time": 0.0036013126373291016,
+          "data": {
+            "msg": "Signature verification failed"
+          }
+        }
+      },
+      "scene_operations": {
+        "error": "No projects available for scene testing"
+      },
+      "analytics": {
+        "dashboard": {
+          "success": true,
+          "response_time": 0.015780925750732422,
+          "data": {
+            "recent_activity": [
+              {
+                "description": "You have 0 active projects",
+                "timestamp": "2025-07-01T21:11:56.865741",
+                "title": "Recent Project Activity",
+                "type": "project_created"
+              }
+            ],
+            "user_stats": {
+              "account_age_days": 0,
+              "active_projects": 0,
+              "completed_projects": 0,
+              "tokens_remaining": 1000,
+              "tokens_used": 0,
+              "total_projects": 0,
+              "total_words_written": 0
+            },
+            "writing_progress": {
+              "average_words_per_project": 0,
+              "most_productive_genre": "Fantasy",
+              "words_this_month": 0,
+              "words_this_week": 0
+            }
+          }
+        }
+      },
+      "error_handling": {
+        "invalid_endpoint": {
+          "returns_404": true,
+          "response_time": 1.0214848518371582
+        },
+        "invalid_project": {
+          "returns_404": false,
+          "response_time": 0.024977922439575195
+        },
+        "malformed_data": {
+          "returns_400": false,
+          "response_time": 0.0031414031982421875
+        },
+        "unauthorized": {
+          "returns_401": true,
+          "response_time": 0.005369663238525391
+        }
+      },
+      "session_summary": {
+        "user_id": "sim_user_3_8ac828db",
+        "email": "test_user_sim_user_3_8ac828db@alvin-test.com",
+        "total_operations": 8,
+        "successful_operations": 2,
+        "failed_operations": 6,
+        "success_rate": 25.0,
+        "projects_created": 0,
+        "scenes_created": 0
+      }
+    },
+    {
+      "error": "Failed to create user session"
+    }
+  ]
+}
