@@ -8,6 +8,88 @@ from app.models import User, Project, Scene, StoryObject, TokenUsageLog, Comment
 
 analytics_bp = Blueprint('analytics', __name__)
 
+@analytics_bp.route('/recent-activity', methods=['GET'])
+@jwt_required()
+def get_recent_activity():
+    """Get recent activity for dashboard"""
+    try:
+        current_user_id = get_jwt_identity()
+        limit = request.args.get('limit', 10, type=int)
+        
+        user = User.query.get(current_user_id)
+        if not user:
+            return jsonify({
+                'error': 'User not found',
+                'message': 'The authenticated user was not found'
+            }), 404
+        
+        # Get recent projects
+        recent_projects = Project.query.filter_by(
+            user_id=current_user_id
+        ).order_by(desc(Project.updated_at)).limit(limit).all()
+        
+        # Get recent scenes
+        recent_scenes = db.session.query(Scene).join(
+            Project, Scene.project_id == Project.id
+        ).filter(
+            Project.user_id == current_user_id
+        ).order_by(desc(Scene.updated_at)).limit(limit).all()
+        
+        # Combine activities and sort by timestamp
+        activities = []
+        
+        # Add project activities
+        for project in recent_projects:
+            activities.append({
+                'id': f"project_{project.id}",
+                'type': 'project_updated',
+                'title': f'Updated "{project.title}"',
+                'description': project.description[:100] + '...' if project.description and len(project.description) > 100 else (project.description or 'No description'),
+                'timestamp': project.updated_at.isoformat(),
+                'project_id': project.id,
+                'metadata': {
+                    'project_title': project.title,
+                    'project_phase': project.current_phase,
+                    'word_count': project.current_word_count or 0
+                }
+            })
+        
+        # Add scene activities
+        for scene in recent_scenes:
+            activities.append({
+                'id': f"scene_{scene.id}",
+                'type': 'scene_updated',
+                'title': f'Updated scene "{scene.title}"',
+                'description': scene.description[:100] + '...' if scene.description and len(scene.description) > 100 else (scene.description or 'No description'),
+                'timestamp': scene.updated_at.isoformat(),
+                'scene_id': scene.id,
+                'project_id': scene.project_id,
+                'metadata': {
+                    'scene_title': scene.title,
+                    'scene_type': scene.scene_type,
+                    'word_count': scene.word_count or 0
+                }
+            })
+        
+        # Sort by timestamp (most recent first) and limit
+        activities.sort(key=lambda x: x['timestamp'], reverse=True)
+        activities = activities[:limit]
+        
+        return jsonify({
+            'activities': activities,
+            'total': len(activities),
+            'limit': limit
+        }), 200
+        
+    except Exception as e:
+        current_app.logger.error(f"Recent activity error: {str(e)}")
+        return jsonify({
+            'error': 'Failed to load recent activity',
+            'message': 'An error occurred while loading recent activity',
+            'activities': [],
+            'total': 0
+        }), 500
+
 @analytics_bp.route('/dashboard', methods=['GET'])
 @jwt_required()
 def get_dashboard_analytics():

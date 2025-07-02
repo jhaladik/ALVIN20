@@ -34,10 +34,7 @@ class SceneUpdateSchema(Schema):
     status = fields.Str(validate=lambda x: x in ['draft', 'completed', 'needs_review'])
 
 class SceneReorderSchema(Schema):
-    scene_order = fields.List(fields.Dict({
-        'id': fields.Int(required=True),
-        'order': fields.Int(required=True)
-    }), required=True)
+    scene_order = fields.List(fields.Raw(), required=True)
 
 def calculate_word_count(text):
     """Calculate word count from text content"""

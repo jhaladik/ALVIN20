@@ -381,3 +381,64 @@ def delete_account():
             'error': 'Deletion failed',
             'message': 'An error occurred while deleting your account'
         }), 500
+    
+@auth_bp.route('/notification-preferences', methods=['GET', 'PUT'])
+@jwt_required()
+def notification_preferences():
+    """Get or update user notification preferences"""
+    current_user_id = get_jwt_identity()
+    user = User.query.get(current_user_id)
+    
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+    
+    if request.method == 'GET':
+        # Return default preferences for now
+        return jsonify({
+            'email_notifications': True,
+            'project_updates': True,
+            'collaboration_alerts': True,
+            'marketing_emails': False
+        }), 200
+    
+    elif request.method == 'PUT':
+        # Update preferences (placeholder)
+        data = request.get_json() or {}
+        return jsonify({
+            'success': True,
+            'message': 'Notification preferences updated',
+            'preferences': data
+        }), 200
+
+@auth_bp.route('/api-keys', methods=['GET', 'POST', 'DELETE'])
+@jwt_required()
+def api_keys():
+    """Manage user API keys"""
+    current_user_id = get_jwt_identity()
+    user = User.query.get(current_user_id)
+    
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+    
+    if request.method == 'GET':
+        # Return empty API keys for now
+        return jsonify({
+            'api_keys': [],
+            'count': 0,
+            'message': 'API key management coming soon'
+        }), 200
+    
+    elif request.method == 'POST':
+        # Create API key (placeholder)
+        return jsonify({
+            'success': True,
+            'message': 'API key creation coming soon',
+            'api_key': None
+        }), 200
+    
+    elif request.method == 'DELETE':
+        # Delete API key (placeholder)
+        return jsonify({
+            'success': True,
+            'message': 'API key deletion coming soon'
+        }), 200

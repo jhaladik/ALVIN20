@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ALVIN Backend Connection Test</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        h1 { color: #2563eb; border-bottom: 2px solid #2563eb; padding-bottom: 10px; }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border-left: 4px solid #e5e7eb;
+            background: #f9fafb;
+        }
+        .success { border-left-color: #10b981; background: #ecfdf5; }
+        .error { border-left-color: #ef4444; background: #fef2f2; }
+        .warning { border-left-color: #f59e0b; background: #fffbeb; }
+        
+        .status { font-weight: bold; margin-bottom: 10px; }
+        .success .status { color: #059669; }
+        .error .status { color: #dc2626; }
+        .warning .status { color: #d97706; }
+        
+        .button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .button:hover { background: #2563eb; }
+        
+        pre {
+            background: #1f2937;
+            color: #f9fafb;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-size: 12px;
+        }
+        
+        .response-box {
+            background: #f3f4f6;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            padding: 10px;
+            margin: 10px 0;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 ALVIN Backend Connection Test</h1>
+        <p><strong>Purpose:</strong> Test if your backend is running and responding correctly.</p>
+        
+        <!-- Backend Status Test -->
+        <div class="test-section" id="backend-status">
+            <div class="status">⏳ Testing Backend Status...</div>
+            <p>Checking if backend is running on http://localhost:5000</p>
+            <div class="response-box" id="status-response">Testing...</div>
+        </div>
+
+        <!-- Health Check Test -->
+        <div class="test-section" id="health-check">
+            <div class="status">⏳ Testing Health Endpoint...</div>
+            <p>Checking /health endpoint</p>
+            <div class="response-box" id="health-response">Testing...</div>
+        </div>
+
+        <!-- API Info Test -->
+        <div class="test-section" id="api-info">
+            <div class="status">⏳ Testing API Info...</div>
+            <p>Checking /api endpoint for demo account info</p>
+            <div class="response-box" id="api-response">Testing...</div>
+        </div>
+
+        <!-- Demo Login Test -->
+        <div class="test-section" id="demo-login">
+            <div class="status">⏳ Testing Demo Login...</div>
+            <p>Testing login with demo@alvin.ai / demo123</p>
+            <div class="response-box" id="login-response">Testing...</div>
+        </div>
+
+        <!-- Manual Tests -->
+        <div class="test-section">
+            <div class="status">🔧 Manual Tests</div>
+            <p>Run these commands in your terminal:</p>
+            <pre># 1. Check if backend process is running
+ps aux | grep python | grep run.py
+
+# 2. Check if port 5000 is in use
+netstat -an | grep :5000
+# or on Windows: netstat -an | findstr :5000
+
+# 3. Start backend manually
+cd backend
+python run.py
+
+# 4. Test with curl (if available)
+curl http://localhost:5000/health</pre>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="test-section">
+            <button class="button" onclick="runAllTests()">🔄 Run All Tests</button>
+            <button class="button" onclick="testSpecificLogin()">🧪 Test Different Login</button>
+            <button class="button" onclick="copyResults()">📋 Copy Results</button>
+        </div>
+
+        <!-- Results Summary -->
+        <div class="test-section" id="summary">
+            <div class="status">📊 Test Summary</div>
+            <div id="summary-content">
+                <p>Click "Run All Tests" to start...</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const BASE_URL = 'http://localhost:5000';
+        const testResults = {
+            status: null,
+            health: null,
+            api: null,
+            login: null
+        };
+
+        function updateTestStatus(sectionId, status, message, isSuccess = true) {
+            const section = document.getElementById(sectionId);
+            const statusEl = section.querySelector('.status');
+            const className = isSuccess ? 'success' : (status.includes('⚠️') ? 'warning' : 'error');
+            
+            section.className = `test-section ${className}`;
+            statusEl.textContent = status;
+        }
+
+        function displayResponse(elementId, data, isError = false) {
+            const element = document.getElementById(elementId);
+            if (isError) {
+                element.innerHTML = `<span style="color: red;">ERROR: ${data}</span>`;
+            } else {
+                element.textContent = JSON.stringify(data, null, 2);
+            }
+        }
+
+        async function testBackendStatus() {
+            console.log('Testing backend status...');
+            try {
+                const response = await fetch(`${BASE_URL}/`, {
+                    method: 'GET',
+                    mode: 'cors'
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    updateTestStatus('backend-status', '✅ Backend Status: RUNNING', 'Backend is responding', true);
+                    displayResponse('status-response', data);
+                    testResults.status = 'success';
+                } else {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+            } catch (error) {
+                console.error('Backend status test failed:', error);
+                updateTestStatus('backend-status', '❌ Backend Status: NOT RESPONDING', 'Backend is not reachable', false);
+                displayResponse('status-response', error.message, true);
+                testResults.status = 'error';
+            }
+        }
+
+        async function testHealthCheck() {
+            console.log('Testing health check...');
+            try {
+                const response = await fetch(`${BASE_URL}/health`, {
+                    method: 'GET',
+                    mode: 'cors'
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    updateTestStatus('health-check', '✅ Health Check: HEALTHY', 'Health endpoint working', true);
+                    displayResponse('health-response', data);
+                    testResults.health = 'success';
+                } else {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+            } catch (error) {
+                console.error('Health check test failed:', error);
+                updateTestStatus('health-check', '❌ Health Check: FAILED', 'Health endpoint not working', false);
+                displayResponse('health-response', error.message, true);
+                testResults.health = 'error';
+            }
+        }
+
+        async function testApiInfo() {
+            console.log('Testing API info...');
+            try {
+                const response = await fetch(`${BASE_URL}/api`, {
+                    method: 'GET',
+                    mode: 'cors'
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    updateTestStatus('api-info', '✅ API Info: AVAILABLE', 'API info endpoint working', true);
+                    displayResponse('api-response', data);
+                    testResults.api = 'success';
+                } else {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+            } catch (error) {
+                console.error('API info test failed:', error);
+                updateTestStatus('api-info', '❌ API Info: FAILED', 'API info endpoint not working', false);
+                displayResponse('api-response', error.message, true);
+                testResults.api = 'error';
+            }
+        }
+
+        async function testDemoLogin() {
+            console.log('Testing demo login...');
+            try {
+                const response = await fetch(`${BASE_URL}/api/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    mode: 'cors',
+                    body: JSON.stringify({
+                        email: 'demo@alvin.ai',
+                        password: 'demo123'
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok && data.access_token) {
+                    updateTestStatus('demo-login', '✅ Demo Login: SUCCESS', 'Demo login working', true);
+                    displayResponse('login-response', {
+                        status: 'Login successful',
+                        user: data.user,
+                        token_received: !!data.access_token
+                    });
+                    testResults.login = 'success';
+                } else {
+                    throw new Error(data.message || `HTTP ${response.status}: ${response.statusText}`);
+                }
+            } catch (error) {
+                console.error('Demo login test failed:', error);
+                updateTestStatus('demo-login', '❌ Demo Login: FAILED', 'Demo login not working', false);
+                displayResponse('login-response', error.message, true);
+                testResults.login = 'error';
+            }
+        }
+
+        async function testSpecificLogin() {
+            const email = prompt('Enter email to test:', 'demo@alvin.ai');
+            const password = prompt('Enter password to test:', 'demo123');
+            
+            if (!email || !password) return;
+            
+            try {
+                const response = await fetch(`${BASE_URL}/api/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    mode: 'cors',
+                    body: JSON.stringify({ email, password })
+                });
+                
+                const data = await response.json();
+                alert(`Login test result:\nStatus: ${response.status}\nMessage: ${data.message || 'No message'}\nToken: ${data.access_token ? 'Received' : 'Not received'}`);
+            } catch (error) {
+                alert(`Login test failed:\n${error.message}`);
+            }
+        }
+
+        function generateSummary() {
+            const summaryDiv = document.getElementById('summary-content');
+            const results = testResults;
+            
+            let html = '<h3>🎯 Test Results Summary:</h3>';
+            
+            // Count successes and failures
+            const successCount = Object.values(results).filter(r => r === 'success').length;
+            const totalTests = Object.keys(results).length;
+            
+            if (successCount === totalTests) {
+                html += '<div style="background: #ecfdf5; padding: 15px; border-radius: 8px; border-left: 4px solid #10b981;">';
+                html += '<p><strong style="color: green;">🎉 ALL TESTS PASSED!</strong></p>';
+                html += '<p>Your backend is running correctly. The login issue may be in your frontend code.</p>';
+                html += '<p><strong>Next steps:</strong></p>';
+                html += '<ol>';
+                html += '<li>Fix demo email in Login.tsx to use <code>demo@alvin.ai</code></li>';
+                html += '<li>Create frontend/.env file with <code>VITE_API_URL=http://localhost:5000</code></li>';
+                html += '<li>Restart your frontend: <code>npm run dev</code></li>';
+                html += '</ol>';
+                html += '</div>';
+            } else {
+                html += '<div style="background: #fef2f2; padding: 15px; border-radius: 8px; border-left: 4px solid #ef4444;">';
+                html += '<p><strong style="color: red;">⚠️ BACKEND ISSUES DETECTED</strong></p>';
+                html += '<p>Your backend is not responding correctly.</p>';
+                html += '<p><strong>Next steps:</strong></p>';
+                html += '<ol>';
+                html += '<li>Make sure backend is running: <code>cd backend && python run.py</code></li>';
+                html += '<li>Check if port 5000 is available</li>';
+                html += '<li>Check terminal for error messages</li>';
+                html += '<li>Verify backend dependencies are installed</li>';
+                html += '</ol>';
+                html += '</div>';
+            }
+            
+            html += '<h4>📋 Detailed Results:</h4>';
+            html += '<ul>';
+            html += `<li>Backend Status: ${results.status === 'success' ? '✅ Working' : '❌ Failed'}</li>`;
+            html += `<li>Health Check: ${results.health === 'success' ? '✅ Working' : '❌ Failed'}</li>`;
+            html += `<li>API Info: ${results.api === 'success' ? '✅ Working' : '❌ Failed'}</li>`;
+            html += `<li>Demo Login: ${results.login === 'success' ? '✅ Working' : '❌ Failed'}</li>`;
+            html += '</ul>';
+            
+            summaryDiv.innerHTML = html;
+        }
+
+        async function runAllTests() {
+            console.log('Starting all backend tests...');
+            
+            // Reset results
+            Object.keys(testResults).forEach(key => testResults[key] = null);
+            
+            // Run tests sequentially with delays
+            await testBackendStatus();
+            await new Promise(resolve => setTimeout(resolve, 500));
+            
+            await testHealthCheck();
+            await new Promise(resolve => setTimeout(resolve, 500));
+            
+            await testApiInfo();
+            await new Promise(resolve => setTimeout(resolve, 500));
+            
+            await testDemoLogin();
+            await new Promise(resolve => setTimeout(resolve, 500));
+            
+            generateSummary();
+        }
+
+        function copyResults() {
+            let report = 'ALVIN BACKEND CONNECTION TEST REPORT\n';
+            report += '=====================================\n';
+            report += `Generated: ${new Date().toISOString()}\n\n`;
+            
+            report += 'TEST RESULTS:\n';
+            report += `- Backend Status: ${testResults.status || 'not tested'}\n`;
+            report += `- Health Check: ${testResults.health || 'not tested'}\n`;
+            report += `- API Info: ${testResults.api || 'not tested'}\n`;
+            report += `- Demo Login: ${testResults.login || 'not tested'}\n\n`;
+            
+            report += 'TROUBLESHOOTING:\n';
+            report += 'If tests failed:\n';
+            report += '1. Start backend: cd backend && python run.py\n';
+            report += '2. Check port 5000 availability\n';
+            report += '3. Verify dependencies installed\n';
+            report += '4. Check terminal for errors\n\n';
+            
+            report += 'If tests passed:\n';
+            report += '1. Fix frontend demo email to demo@alvin.ai\n';
+            report += '2. Create frontend/.env with VITE_API_URL=http://localhost:5000\n';
+            report += '3. Restart frontend\n';
+            
+            navigator.clipboard.writeText(report).then(() => {
+                alert('Test report copied to clipboard!');
+            });
+        }
+
+        // Auto-start tests when page loads
+        window.addEventListener('load', () => {
+            setTimeout(runAllTests, 1000);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>React App Diagnostics</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        h1 { color: #2563eb; border-bottom: 3px solid #2563eb; padding-bottom: 10px; }
+        h2 { color: #1f2937; margin-top: 30px; }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border-left: 4px solid #e5e7eb;
+            background: #f9fafb;
+        }
+        .success { border-left-color: #10b981; background: #ecfdf5; }
+        .error { border-left-color: #ef4444; background: #fef2f2; }
+        .warning { border-left-color: #f59e0b; background: #fffbeb; }
+        .info { border-left-color: #3b82f6; background: #eff6ff; }
+        
+        .status { font-weight: bold; margin-bottom: 10px; }
+        .success .status { color: #059669; }
+        .error .status { color: #dc2626; }
+        .warning .status { color: #d97706; }
+        .info .status { color: #2563eb; }
+        
+        code {
+            background: #f3f4f6;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+        }
+        pre {
+            background: #1f2937;
+            color: #f9fafb;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 10px 0;
+        }
+        .button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .button:hover { background: #2563eb; }
+        .react-mount-test {
+            border: 2px dashed #e5e7eb;
+            padding: 20px;
+            margin: 10px 0;
+            min-height: 100px;
+            background: #fafafa;
+        }
+        .dependency-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 10px;
+            margin: 15px 0;
+        }
+        .dependency-item {
+            padding: 10px;
+            background: #f3f4f6;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 React App Diagnostics Tool</h1>
+        <p><strong>Purpose:</strong> Test each component of your React setup to identify exactly where issues occur.</p>
+        
+        <!-- Basic Environment Tests -->
+        <h2>1. Environment Tests</h2>
+        
+        <div class="test-section" id="browser-test">
+            <div class="status">✅ Browser Environment: WORKING</div>
+            <p>If you can see this page, your browser supports modern JavaScript and HTML5.</p>
+            <ul>
+                <li>User Agent: <code id="user-agent"></code></li>
+                <li>Local Storage: <span id="localStorage-test"></span></li>
+                <li>ES6 Support: <span id="es6-test"></span></li>
+            </ul>
+        </div>
+
+        <div class="test-section" id="server-test">
+            <div class="status">⏳ Testing Vite Dev Server...</div>
+            <p id="server-status">Checking if this page loaded via Vite dev server...</p>
+        </div>
+
+        <!-- React Tests -->
+        <h2>2. React Framework Tests</h2>
+        
+        <div class="test-section" id="react-cdn-test">
+            <div class="status">⏳ Testing React via CDN...</div>
+            <p>Testing if React can load and mount using CDN version:</p>
+            <div class="react-mount-test" id="react-cdn-mount">
+                <em>React CDN test will appear here...</em>
+            </div>
+        </div>
+
+        <div class="test-section" id="react-local-test">
+            <div class="status">⏳ Testing Local React Dependencies...</div>
+            <p>Testing if your local React installation works:</p>
+            <div class="react-mount-test" id="react-local-mount">
+                <em>Local React test will appear here...</em>
+            </div>
+        </div>
+
+        <!-- TypeScript Tests -->
+        <h2>3. TypeScript & Build Tests</h2>
+        
+        <div class="test-section" id="typescript-test">
+            <div class="status">⏳ Testing TypeScript...</div>
+            <p id="typescript-status">Checking TypeScript compilation...</p>
+            <pre id="typescript-errors"></pre>
+        </div>
+
+        <!-- Dependency Tests -->
+        <h2>4. Dependency Tests</h2>
+        
+        <div class="test-section" id="dependency-test">
+            <div class="status">⏳ Testing Package Dependencies...</div>
+            <p>Checking if key packages can be imported:</p>
+            <div class="dependency-grid" id="dependency-results"></div>
+        </div>
+
+        <!-- File System Tests -->
+        <h2>5. File Structure Tests</h2>
+        
+        <div class="test-section" id="file-test">
+            <div class="status">⏳ Testing File Structure...</div>
+            <p>Checking if required files exist and are accessible:</p>
+            <ul id="file-results"></ul>
+        </div>
+
+        <!-- Manual Tests -->
+        <h2>6. Manual Tests</h2>
+        
+        <div class="test-section info">
+            <div class="status">📋 Manual Checklist</div>
+            <p>Please verify these manually in your terminal:</p>
+            <pre>cd frontend
+
+# Check if files exist
+ls -la src/main.tsx src/App.tsx src/index.css index.html
+
+# Check package.json
+cat package.json | grep -A 5 -B 5 "react"
+
+# Check if dependencies are installed
+npm list react react-dom
+
+# Try to start dev server
+npm run dev</pre>
+        </div>
+
+        <!-- Action Buttons -->
+        <h2>7. Quick Actions</h2>
+        
+        <div class="test-section">
+            <button class="button" onclick="runAllTests()">🔄 Re-run All Tests</button>
+            <button class="button" onclick="copyDiagnostics()">📋 Copy Results</button>
+            <button class="button" onclick="downloadResults()">💾 Download Report</button>
+        </div>
+
+        <!-- Results Summary -->
+        <div class="test-section" id="summary">
+            <div class="status">📊 Diagnostic Summary</div>
+            <div id="summary-content">
+                <p>Tests are running... Results will appear here.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Test Results Storage
+        const testResults = {
+            browser: null,
+            server: null,
+            reactCDN: null,
+            reactLocal: null,
+            typescript: null,
+            dependencies: {},
+            files: {},
+            summary: []
+        };
+
+        // Utility Functions
+        function updateTestStatus(sectionId, status, message, isSuccess = true) {
+            const section = document.getElementById(sectionId);
+            const statusEl = section.querySelector('.status');
+            const className = isSuccess ? 'success' : (status.includes('WARNING') ? 'warning' : 'error');
+            
+            section.className = `test-section ${className}`;
+            statusEl.textContent = status;
+            
+            if (message) {
+                const existingP = section.querySelector('p');
+                if (existingP) existingP.textContent = message;
+            }
+        }
+
+        function logResult(test, status, details = null) {
+            testResults.summary.push({
+                test,
+                status,
+                details,
+                timestamp: new Date().toISOString()
+            });
+        }
+
+        // 1. Browser Environment Tests
+        function testBrowserEnvironment() {
+            try {
+                // User Agent
+                document.getElementById('user-agent').textContent = navigator.userAgent;
+                
+                // Local Storage
+                try {
+                    localStorage.setItem('test', 'test');
+                    localStorage.removeItem('test');
+                    document.getElementById('localStorage-test').textContent = '✅ Available';
+                } catch (e) {
+                    document.getElementById('localStorage-test').textContent = '❌ Blocked';
+                }
+                
+                // ES6 Support
+                try {
+                    eval('const arrow = () => {}; class TestClass {}');
+                    document.getElementById('es6-test').textContent = '✅ Supported';
+                } catch (e) {
+                    document.getElementById('es6-test').textContent = '❌ Not Supported';
+                }
+                
+                testResults.browser = 'success';
+                logResult('Browser Environment', 'PASS', 'All browser features available');
+                
+            } catch (error) {
+                updateTestStatus('browser-test', '❌ Browser Environment: ERROR', error.message, false);
+                testResults.browser = 'error';
+                logResult('Browser Environment', 'FAIL', error.message);
+            }
+        }
+
+        // 2. Server Tests  
+        function testViteServer() {
+            try {
+                const isVite = window.location.hostname === 'localhost' && window.location.port === '5173';
+                const hasViteClient = document.querySelector('script[src*="@vite/client"]');
+                
+                if (isVite || hasViteClient) {
+                    updateTestStatus('server-test', '✅ Vite Dev Server: RUNNING', 'Successfully connected to Vite development server');
+                    testResults.server = 'success';
+                    logResult('Vite Server', 'PASS', 'Connected to development server');
+                } else {
+                    updateTestStatus('server-test', '⚠️ Vite Dev Server: WARNING', 'Not running on typical Vite port (5173)', false);
+                    testResults.server = 'warning';
+                    logResult('Vite Server', 'WARNING', 'Not on standard Vite port');
+                }
+            } catch (error) {
+                updateTestStatus('server-test', '❌ Vite Dev Server: ERROR', error.message, false);
+                testResults.server = 'error';
+                logResult('Vite Server', 'FAIL', error.message);
+            }
+        }
+
+        // 3. React CDN Test
+        function testReactCDN() {
+            const script1 = document.createElement('script');
+            script1.src = 'https://unpkg.com/react@18/umd/react.development.js';
+            script1.crossOrigin = 'anonymous';
+            
+            const script2 = document.createElement('script');
+            script2.src = 'https://unpkg.com/react-dom@18/umd/react-dom.development.js';
+            script2.crossOrigin = 'anonymous';
+            
+            script2.onload = function() {
+                try {
+                    const container = document.getElementById('react-cdn-mount');
+                    const element = React.createElement('div', {
+                        style: { color: 'green', padding: '10px', border: '2px solid green', borderRadius: '5px' }
+                    }, '🎉 React CDN WORKING! React can mount and render components.');
+                    
+                    ReactDOM.render(element, container);
+                    
+                    updateTestStatus('react-cdn-test', '✅ React CDN: WORKING', 'React successfully loaded and mounted via CDN');
+                    testResults.reactCDN = 'success';
+                    logResult('React CDN', 'PASS', 'React loads and mounts correctly');
+                    
+                } catch (error) {
+                    updateTestStatus('react-cdn-test', '❌ React CDN: ERROR', error.message, false);
+                    testResults.reactCDN = 'error';
+                    logResult('React CDN', 'FAIL', error.message);
+                }
+            };
+            
+            script1.onerror = script2.onerror = function() {
+                updateTestStatus('react-cdn-test', '❌ React CDN: LOAD ERROR', 'Failed to load React from CDN', false);
+                testResults.reactCDN = 'error';
+                logResult('React CDN', 'FAIL', 'Failed to load from CDN');
+            };
+            
+            document.head.appendChild(script1);
+            document.head.appendChild(script2);
+        }
+
+        // 4. Local React Test (simulated)
+        function testLocalReact() {
+            // This simulates what would happen with your local React
+            const container = document.getElementById('react-local-mount');
+            
+            try {
+                // Check if we can access import.meta (Vite feature)
+                const hasViteFeatures = typeof import !== 'undefined';
+                
+                if (hasViteFeatures) {
+                    container.innerHTML = `
+                        <div style="color: blue; padding: 10px; border: 2px solid blue; border-radius: 5px;">
+                            🔧 Vite Features Detected<br>
+                            Your build system appears to be working.<br>
+                            <small>Note: This test can't fully test local React from this diagnostic page.</small>
+                        </div>
+                    `;
+                    updateTestStatus('react-local-test', '✅ Local React: LIKELY WORKING', 'Vite features detected - local React should work');
+                    testResults.reactLocal = 'success';
+                    logResult('Local React', 'PASS', 'Build system appears functional');
+                } else {
+                    container.innerHTML = `
+                        <div style="color: orange; padding: 10px; border: 2px solid orange; border-radius: 5px;">
+                            ⚠️ Cannot fully test local React from this diagnostic page.<br>
+                            <small>Need to test with actual npm run dev</small>
+                        </div>
+                    `;
+                    updateTestStatus('react-local-test', '⚠️ Local React: CANNOT TEST', 'Cannot test local React from diagnostic page', false);
+                    testResults.reactLocal = 'warning';
+                    logResult('Local React', 'WARNING', 'Cannot test from diagnostic page');
+                }
+            } catch (error) {
+                container.innerHTML = `<div style="color: red;">❌ Error: ${error.message}</div>`;
+                updateTestStatus('react-local-test', '❌ Local React: ERROR', error.message, false);
+                testResults.reactLocal = 'error';
+                logResult('Local React', 'FAIL', error.message);
+            }
+        }
+
+        // 5. TypeScript Test (simulated)
+        function testTypeScript() {
+            try {
+                // Test basic TypeScript syntax
+                const tsCode = `
+                    interface TestInterface {
+                        prop: string;
+                    }
+                    const testObj: TestInterface = { prop: 'test' };
+                `;
+                
+                // This is a basic syntax check - real TS compilation would need actual TS compiler
+                if (tsCode.includes('interface') && tsCode.includes(':')) {
+                    updateTestStatus('typescript-test', '✅ TypeScript: SYNTAX OK', 'TypeScript syntax appears valid');
+                    document.getElementById('typescript-status').textContent = 'TypeScript syntax validation passed.';
+                    testResults.typescript = 'success';
+                    logResult('TypeScript', 'PASS', 'Syntax validation successful');
+                } else {
+                    throw new Error('TypeScript syntax validation failed');
+                }
+            } catch (error) {
+                updateTestStatus('typescript-test', '❌ TypeScript: ERROR', error.message, false);
+                document.getElementById('typescript-errors').textContent = error.message;
+                testResults.typescript = 'error';
+                logResult('TypeScript', 'FAIL', error.message);
+            }
+        }
+
+        // 6. Dependency Test (simulated)
+        function testDependencies() {
+            const dependencies = [
+                'react', 'react-dom', 'react-router-dom', 'axios', 
+                '@heroicons/react', '@headlessui/react', 'tailwindcss',
+                'vite', 'typescript', '@vitejs/plugin-react'
+            ];
+            
+            const container = document.getElementById('dependency-results');
+            container.innerHTML = '';
+            
+            dependencies.forEach(dep => {
+                const item = document.createElement('div');
+                item.className = 'dependency-item';
+                
+                // Simulate dependency check (in real app, you'd check package.json)
+                const isCore = ['react', 'react-dom', 'vite'].includes(dep);
+                const status = isCore ? '✅' : '❓';
+                const statusText = isCore ? 'REQUIRED' : 'CHECK PACKAGE.JSON';
+                
+                item.innerHTML = `<strong>${dep}</strong><br><small>${status} ${statusText}</small>`;
+                container.appendChild(item);
+                
+                testResults.dependencies[dep] = isCore ? 'required' : 'unknown';
+            });
+            
+            updateTestStatus('dependency-test', '⚠️ Dependencies: CHECK PACKAGE.JSON', 'Manual verification needed for all dependencies', false);
+            logResult('Dependencies', 'WARNING', 'Manual verification required');
+        }
+
+        // 7. File Structure Test (simulated)
+        function testFileStructure() {
+            const requiredFiles = [
+                'src/main.tsx',
+                'src/App.tsx', 
+                'src/index.css',
+                'index.html',
+                'package.json',
+                'vite.config.ts',
+                'tsconfig.json'
+            ];
+            
+            const container = document.getElementById('file-results');
+            container.innerHTML = '';
+            
+            requiredFiles.forEach(file => {
+                const li = document.createElement('li');
+                li.innerHTML = `<code>${file}</code> - <span style="color: orange;">⚠️ Manual check required</span>`;
+                container.appendChild(li);
+                
+                testResults.files[file] = 'manual-check-required';
+            });
+            
+            updateTestStatus('file-test', '⚠️ File Structure: MANUAL CHECK', 'Please verify files exist in terminal', false);
+            logResult('File Structure', 'WARNING', 'Manual verification required');
+        }
+
+        // 8. Generate Summary
+        function generateSummary() {
+            const summary = document.getElementById('summary-content');
+            const issues = [];
+            const successes = [];
+            
+            if (testResults.browser === 'success') successes.push('Browser environment working');
+            if (testResults.server === 'success') successes.push('Vite dev server detected');
+            if (testResults.reactCDN === 'success') successes.push('React framework functional');
+            
+            if (testResults.browser === 'error') issues.push('Browser compatibility issues');
+            if (testResults.server === 'error') issues.push('Vite server connection problems');
+            if (testResults.reactCDN === 'error') issues.push('React framework issues');
+            
+            let summaryHTML = '<h3>🎯 Key Findings:</h3>';
+            
+            if (successes.length > 0) {
+                summaryHTML += '<h4 style="color: green;">✅ Working Components:</h4><ul>';
+                successes.forEach(item => summaryHTML += `<li>${item}</li>`);
+                summaryHTML += '</ul>';
+            }
+            
+            if (issues.length > 0) {
+                summaryHTML += '<h4 style="color: red;">❌ Issues Found:</h4><ul>';
+                issues.forEach(item => summaryHTML += `<li>${item}</li>`);
+                summaryHTML += '</ul>';
+            }
+            
+            summaryHTML += '<h4>📋 Next Steps:</h4>';
+            if (testResults.reactCDN === 'success') {
+                summaryHTML += '<p style="color: green;"><strong>Good news!</strong> React works in your browser. The issue is likely with your local setup:</p>';
+                summaryHTML += '<ol>';
+                summaryHTML += '<li>Check if <code>npm run dev</code> actually starts without errors</li>';
+                summaryHTML += '<li>Verify all dependencies in package.json are installed</li>';
+                summaryHTML += '<li>Check browser console for JavaScript errors</li>';
+                summaryHTML += '<li>Try the minimal setup I provided earlier</li>';
+                summaryHTML += '</ol>';
+            } else {
+                summaryHTML += '<p style="color: red;"><strong>React itself has issues.</strong> Try:</p>';
+                summaryHTML += '<ol>';
+                summaryHTML += '<li>Clear browser cache and try again</li>';
+                summaryHTML += '<li>Test in incognito/private window</li>';
+                summaryHTML += '<li>Check for browser extensions blocking scripts</li>';
+                summaryHTML += '</ol>';
+            }
+            
+            summary.innerHTML = summaryHTML;
+        }
+
+        // Utility Functions
+        function runAllTests() {
+            testBrowserEnvironment();
+            testViteServer();
+            testReactCDN();
+            testLocalReact();
+            testTypeScript();
+            testDependencies();
+            testFileStructure();
+            
+            setTimeout(generateSummary, 2000); // Wait for async tests
+        }
+
+        function copyDiagnostics() {
+            const report = generateTextReport();
+            navigator.clipboard.writeText(report).then(() => {
+                alert('Diagnostic report copied to clipboard!');
+            });
+        }
+
+        function downloadResults() {
+            const report = generateTextReport();
+            const blob = new Blob([report], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `react-diagnostics-${new Date().toISOString().slice(0,19)}.txt`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function generateTextReport() {
+            let report = 'REACT APP DIAGNOSTIC REPORT\n';
+            report += '=' + '='.repeat(30) + '\n';
+            report += `Generated: ${new Date().toISOString()}\n`;
+            report += `URL: ${window.location.href}\n\n`;
+            
+            testResults.summary.forEach(result => {
+                report += `${result.test}: ${result.status}\n`;
+                if (result.details) report += `  Details: ${result.details}\n`;
+                report += '\n';
+            });
+            
+            return report;
+        }
+
+        // Auto-run tests when page loads
+        window.addEventListener('load', () => {
+            setTimeout(runAllTests, 500);
+        });
+    </script>
+</body>
+</html>

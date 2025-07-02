@@ -7,6 +7,7 @@ from sqlalchemy import desc, func
 from app import db
 from app.models import User, BillingPlan, UserSubscription, TokenUsageLog
 
+
 billing_bp = Blueprint('billing', __name__)
 
 # Validation schemas
