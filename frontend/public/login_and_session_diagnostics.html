@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ALVIN Session Persistence Test</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        h1 { color: #2563eb; border-bottom: 2px solid #2563eb; padding-bottom: 10px; }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border-left: 4px solid #e5e7eb;
+            background: #f9fafb;
+        }
+        .success { border-left-color: #10b981; background: #ecfdf5; }
+        .error { border-left-color: #ef4444; background: #fef2f2; }
+        .warning { border-left-color: #f59e0b; background: #fffbeb; }
+        .info { border-left-color: #3b82f6; background: #eff6ff; }
+        
+        .status { font-weight: bold; margin-bottom: 10px; }
+        .success .status { color: #059669; }
+        .error .status { color: #dc2626; }
+        .warning .status { color: #d97706; }
+        .info .status { color: #2563eb; }
+        
+        .button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .button:hover { background: #2563eb; }
+        .button:disabled { background: #9ca3af; cursor: not-allowed; }
+        
+        .token-display {
+            background: #f3f4f6;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            padding: 10px;
+            margin: 10px 0;
+            font-family: monospace;
+            font-size: 11px;
+            word-break: break-all;
+            max-height: 100px;
+            overflow-y: auto;
+        }
+        
+        .response-box {
+            background: #f3f4f6;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            padding: 10px;
+            margin: 10px 0;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+        
+        .session-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin: 15px 0;
+        }
+        
+        .session-item {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            padding: 10px;
+            font-size: 12px;
+        }
+        
+        .log-area {
+            background: #1a1a1a;
+            color: #00ff00;
+            padding: 10px;
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 11px;
+            max-height: 200px;
+            overflow-y: auto;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔐 ALVIN Session Persistence Test</h1>
+        <p><strong>Purpose:</strong> Test login, token storage, and session persistence to diagnose why login connection is lost.</p>
+        
+        <!-- Session Status -->
+        <div class="test-section info" id="session-status">
+            <div class="status">📊 Session Status: Not Started</div>
+            <div class="session-info" id="session-info">
+                <div class="session-item">
+                    <strong>Login Status:</strong><br>
+                    <span id="login-status">Not logged in</span>
+                </div>
+                <div class="session-item">
+                    <strong>Token Stored:</strong><br>
+                    <span id="token-status">No token</span>
+                </div>
+                <div class="session-item">
+                    <strong>Token Valid:</strong><br>
+                    <span id="token-valid">Unknown</span>
+                </div>
+                <div class="session-item">
+                    <strong>User Info:</strong><br>
+                    <span id="user-info">None</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 1: Login Test -->
+        <div class="test-section" id="login-test">
+            <div class="status">⏳ Step 1: Login Test</div>
+            <p>Testing login and token storage...</p>
+            <button class="button" onclick="testLogin()">🔑 Test Login</button>
+            <div class="response-box" id="login-response">Click "Test Login" to start...</div>
+            <div id="token-display"></div>
+        </div>
+
+        <!-- Step 2: Token Persistence -->
+        <div class="test-section" id="token-test">
+            <div class="status">⏳ Step 2: Token Persistence</div>
+            <p>Testing if token persists in localStorage and can be retrieved...</p>
+            <button class="button" onclick="testTokenPersistence()" disabled>🔄 Test Token Persistence</button>
+            <div class="response-box" id="token-response">Complete login test first...</div>
+        </div>
+
+        <!-- Step 3: Authenticated Requests -->
+        <div class="test-section" id="auth-requests">
+            <div class="status">⏳ Step 3: Authenticated Requests</div>
+            <p>Testing authenticated API calls using stored token...</p>
+            <button class="button" onclick="testAuthenticatedRequests()" disabled>🛡️ Test Auth Requests</button>
+            <div class="response-box" id="auth-response">Complete previous tests first...</div>
+        </div>
+
+        <!-- Step 4: Session Validation -->
+        <div class="test-section" id="session-validation">
+            <div class="status">⏳ Step 4: Session Validation</div>
+            <p>Testing /api/auth/me endpoint to validate session...</p>
+            <button class="button" onclick="testSessionValidation()" disabled>✅ Validate Session</button>
+            <div class="response-box" id="validation-response">Complete previous tests first...</div>
+        </div>
+
+        <!-- Step 5: Session Lifecycle -->
+        <div class="test-section" id="session-lifecycle">
+            <div class="status">⏳ Step 5: Session Lifecycle Simulation</div>
+            <p>Simulating real frontend session behavior over time...</p>
+            <button class="button" onclick="simulateSessionLifecycle()" disabled>🔄 Simulate Real Session</button>
+            <button class="button" onclick="stopSimulation()" disabled id="stop-btn">⏹️ Stop Simulation</button>
+            <div class="response-box" id="lifecycle-response">Complete previous tests first...</div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="test-section">
+            <button class="button" onclick="runFullTest()">🚀 Run Full Test Suite</button>
+            <button class="button" onclick="clearSession()">🗑️ Clear Session</button>
+            <button class="button" onclick="copyResults()">📋 Copy Results</button>
+        </div>
+
+        <!-- Live Log -->
+        <div class="test-section">
+            <div class="status">📝 Live Test Log</div>
+            <div class="log-area" id="test-log">Test log will appear here...</div>
+        </div>
+
+        <!-- Results Summary -->
+        <div class="test-section" id="final-summary">
+            <div class="status">📊 Test Summary</div>
+            <div id="summary-content">
+                <p>Run tests to see results...</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const BASE_URL = 'http://localhost:5000';
+        let simulationInterval = null;
+        let testResults = {
+            login: null,
+            tokenPersistence: null,
+            authRequests: null,
+            sessionValidation: null,
+            sessionLifecycle: null
+        };
+        let sessionData = {
+            token: null,
+            user: null,
+            loginTime: null
+        };
+
+        function log(message, type = 'info') {
+            const logArea = document.getElementById('test-log');
+            const timestamp = new Date().toISOString().split('T')[1].split('.')[0];
+            const colors = {
+                info: '#00ff00',
+                error: '#ff6b6b',
+                warning: '#ffd93d',
+                success: '#00ff88'
+            };
+            
+            const logEntry = document.createElement('div');
+            logEntry.style.color = colors[type] || '#00ff00';
+            logEntry.textContent = `[${timestamp}] ${message}`;
+            logArea.appendChild(logEntry);
+            logArea.scrollTop = logArea.scrollHeight;
+        }
+
+        function updateSessionStatus() {
+            const token = localStorage.getItem('authToken');
+            document.getElementById('login-status').textContent = sessionData.user ? 'Logged in' : 'Not logged in';
+            document.getElementById('token-status').textContent = token ? 'Token stored' : 'No token';
+            document.getElementById('user-info').textContent = sessionData.user ? 
+                `${sessionData.user.email} (${sessionData.user.plan})` : 'None';
+            
+            // Show token in display area
+            const tokenDisplay = document.getElementById('token-display');
+            if (token) {
+                tokenDisplay.innerHTML = `<strong>Stored Token:</strong><div class="token-display">${token}</div>`;
+            } else {
+                tokenDisplay.innerHTML = '';
+            }
+        }
+
+        function updateTestStatus(sectionId, status, message, isSuccess = true) {
+            const section = document.getElementById(sectionId);
+            const statusEl = section.querySelector('.status');
+            const className = isSuccess ? 'success' : (status.includes('⚠️') ? 'warning' : 'error');
+            
+            section.className = `test-section ${className}`;
+            statusEl.textContent = status;
+        }
+
+        function enableButton(buttonText) {
+            const buttons = document.querySelectorAll('.button');
+            buttons.forEach(btn => {
+                if (btn.textContent.includes(buttonText)) {
+                    btn.disabled = false;
+                }
+            });
+        }
+
+        async function testLogin() {
+            log('Starting login test...', 'info');
+            updateTestStatus('login-test', '⏳ Step 1: Testing Login...', 'Testing...', true);
+            
+            try {
+                const response = await fetch(`${BASE_URL}/api/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    mode: 'cors',
+                    body: JSON.stringify({
+                        email: 'demo@alvin.ai',
+                        password: 'demo123'
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok && data.access_token) {
+                    // Store token in localStorage (simulating frontend behavior)
+                    localStorage.setItem('authToken', data.access_token);
+                    sessionData.token = data.access_token;
+                    sessionData.user = data.user;
+                    sessionData.loginTime = new Date();
+                    
+                    updateTestStatus('login-test', '✅ Step 1: Login Successful', 'Login and token storage working', true);
+                    document.getElementById('login-response').innerHTML = 
+                        `<strong>✅ LOGIN SUCCESS</strong><br>
+                         User: ${data.user.email}<br>
+                         Plan: ${data.user.plan}<br>
+                         Token stored: Yes<br>
+                         Login time: ${sessionData.loginTime.toLocaleTimeString()}`;
+                    
+                    testResults.login = 'success';
+                    enableButton('Test Token Persistence');
+                    log('Login successful, token stored in localStorage', 'success');
+                } else {
+                    throw new Error(data.message || `HTTP ${response.status}: ${response.statusText}`);
+                }
+            } catch (error) {
+                log(`Login failed: ${error.message}`, 'error');
+                updateTestStatus('login-test', '❌ Step 1: Login Failed', 'Login not working', false);
+                document.getElementById('login-response').innerHTML = 
+                    `<strong>❌ LOGIN FAILED</strong><br>Error: ${error.message}`;
+                testResults.login = 'error';
+            }
+            
+            updateSessionStatus();
+        }
+
+        async function testTokenPersistence() {
+            log('Testing token persistence...', 'info');
+            updateTestStatus('token-test', '⏳ Step 2: Testing Token Persistence...', 'Testing...', true);
+            
+            try {
+                // Check if token exists in localStorage
+                const storedToken = localStorage.getItem('authToken');
+                
+                if (!storedToken) {
+                    throw new Error('No token found in localStorage');
+                }
+                
+                // Verify token format (JWT should have 3 parts)
+                const tokenParts = storedToken.split('.');
+                if (tokenParts.length !== 3) {
+                    throw new Error('Invalid token format (not a JWT)');
+                }
+                
+                // Try to decode token payload (without verification)
+                let tokenPayload = null;
+                try {
+                    const payload = JSON.parse(atob(tokenParts[1]));
+                    tokenPayload = payload;
+                    log(`Token payload: ${JSON.stringify(payload, null, 2)}`, 'info');
+                } catch (e) {
+                    log('Warning: Could not decode token payload', 'warning');
+                }
+                
+                updateTestStatus('token-test', '✅ Step 2: Token Persistence Working', 'Token stored and accessible', true);
+                document.getElementById('token-response').innerHTML = 
+                    `<strong>✅ TOKEN PERSISTENCE SUCCESS</strong><br>
+                     Token found: Yes<br>
+                     Token format: Valid JWT<br>
+                     Token length: ${storedToken.length} chars<br>
+                     Payload: ${tokenPayload ? JSON.stringify(tokenPayload, null, 2) : 'Could not decode'}`;
+                
+                testResults.tokenPersistence = 'success';
+                enableButton('Test Auth Requests');
+                log('Token persistence test passed', 'success');
+                
+            } catch (error) {
+                log(`Token persistence failed: ${error.message}`, 'error');
+                updateTestStatus('token-test', '❌ Step 2: Token Persistence Failed', 'Token not properly stored', false);
+                document.getElementById('token-response').innerHTML = 
+                    `<strong>❌ TOKEN PERSISTENCE FAILED</strong><br>Error: ${error.message}`;
+                testResults.tokenPersistence = 'error';
+            }
+            
+            updateSessionStatus();
+        }
+
+        async function testAuthenticatedRequests() {
+            log('Testing authenticated requests...', 'info');
+            updateTestStatus('auth-requests', '⏳ Step 3: Testing Authenticated Requests...', 'Testing...', true);
+            
+            try {
+                const token = localStorage.getItem('authToken');
+                if (!token) {
+                    throw new Error('No token available for authenticated request');
+                }
+                
+                // Test authenticated request to a protected endpoint
+                const response = await fetch(`${BASE_URL}/api/auth/me`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json',
+                    },
+                    mode: 'cors'
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    updateTestStatus('auth-requests', '✅ Step 3: Authenticated Requests Working', 'Token accepted by backend', true);
+                    document.getElementById('auth-response').innerHTML = 
+                        `<strong>✅ AUTHENTICATED REQUEST SUCCESS</strong><br>
+                         Response status: ${response.status}<br>
+                         User verified: ${data.user ? 'Yes' : 'No'}<br>
+                         User email: ${data.user?.email || 'N/A'}<br>
+                         Token valid: Yes`;
+                    
+                    testResults.authRequests = 'success';
+                    enableButton('Validate Session');
+                    log('Authenticated request successful', 'success');
+                    
+                    // Update token validation status
+                    document.getElementById('token-valid').textContent = 'Valid';
+                } else {
+                    throw new Error(`Auth request failed: ${response.status} - ${data.message || response.statusText}`);
+                }
+            } catch (error) {
+                log(`Authenticated request failed: ${error.message}`, 'error');
+                updateTestStatus('auth-requests', '❌ Step 3: Authenticated Requests Failed', 'Token rejected by backend', false);
+                document.getElementById('auth-response').innerHTML = 
+                    `<strong>❌ AUTHENTICATED REQUEST FAILED</strong><br>Error: ${error.message}`;
+                testResults.authRequests = 'error';
+                document.getElementById('token-valid').textContent = 'Invalid';
+            }
+            
+            updateSessionStatus();
+        }
+
+        async function testSessionValidation() {
+            log('Testing session validation...', 'info');
+            updateTestStatus('session-validation', '⏳ Step 4: Testing Session Validation...', 'Testing...', true);
+            
+            try {
+                const token = localStorage.getItem('authToken');
+                if (!token) {
+                    throw new Error('No token available for session validation');
+                }
+                
+                // Multiple validation attempts to test consistency
+                const validationTests = [];
+                
+                for (let i = 1; i <= 3; i++) {
+                    const response = await fetch(`${BASE_URL}/api/auth/me`, {
+                        method: 'GET',
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json',
+                        },
+                        mode: 'cors'
+                    });
+                    
+                    validationTests.push({
+                        attempt: i,
+                        status: response.status,
+                        ok: response.ok,
+                        timestamp: new Date().toISOString()
+                    });
+                    
+                    log(`Validation attempt ${i}: ${response.status}`, response.ok ? 'success' : 'error');
+                    
+                    // Small delay between requests
+                    if (i < 3) await new Promise(resolve => setTimeout(resolve, 500));
+                }
+                
+                const successfulValidations = validationTests.filter(test => test.ok).length;
+                
+                if (successfulValidations === 3) {
+                    updateTestStatus('session-validation', '✅ Step 4: Session Validation Working', 'Consistent validation success', true);
+                    document.getElementById('validation-response').innerHTML = 
+                        `<strong>✅ SESSION VALIDATION SUCCESS</strong><br>
+                         Validation attempts: 3/3 successful<br>
+                         Token consistency: Excellent<br>
+                         Session stable: Yes`;
+                    
+                    testResults.sessionValidation = 'success';
+                    enableButton('Simulate Real Session');
+                    log('Session validation passed all tests', 'success');
+                } else {
+                    throw new Error(`Inconsistent validation: only ${successfulValidations}/3 attempts succeeded`);
+                }
+                
+            } catch (error) {
+                log(`Session validation failed: ${error.message}`, 'error');
+                updateTestStatus('session-validation', '❌ Step 4: Session Validation Failed', 'Session not stable', false);
+                document.getElementById('validation-response').innerHTML = 
+                    `<strong>❌ SESSION VALIDATION FAILED</strong><br>Error: ${error.message}`;
+                testResults.sessionValidation = 'error';
+            }
+            
+            updateSessionStatus();
+        }
+
+        async function simulateSessionLifecycle() {
+            log('Starting session lifecycle simulation...', 'info');
+            updateTestStatus('session-lifecycle', '⏳ Step 5: Simulating Real Session...', 'Running simulation...', true);
+            
+            enableButton('Stop Simulation');
+            document.getElementById('stop-btn').disabled = false;
+            
+            let attemptCount = 0;
+            let successCount = 0;
+            let errorCount = 0;
+            
+            simulationInterval = setInterval(async () => {
+                attemptCount++;
+                
+                try {
+                    const token = localStorage.getItem('authToken');
+                    if (!token) {
+                        throw new Error('Token lost during simulation');
+                    }
+                    
+                    const response = await fetch(`${BASE_URL}/api/auth/me`, {
+                        method: 'GET',
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json',
+                        },
+                        mode: 'cors'
+                    });
+                    
+                    if (response.ok) {
+                        successCount++;
+                        log(`Simulation check ${attemptCount}: ✅ Session active`, 'success');
+                    } else {
+                        errorCount++;
+                        log(`Simulation check ${attemptCount}: ❌ Session failed (${response.status})`, 'error');
+                    }
+                    
+                } catch (error) {
+                    errorCount++;
+                    log(`Simulation check ${attemptCount}: ❌ Error: ${error.message}`, 'error');
+                }
+                
+                // Update display
+                document.getElementById('lifecycle-response').innerHTML = 
+                    `<strong>🔄 SIMULATION RUNNING</strong><br>
+                     Total checks: ${attemptCount}<br>
+                     Successful: ${successCount}<br>
+                     Failed: ${errorCount}<br>
+                     Success rate: ${attemptCount > 0 ? Math.round((successCount/attemptCount)*100) : 0}%<br>
+                     Duration: ${Math.floor(attemptCount * 3)} seconds`;
+                
+                // Stop after 10 attempts or if too many failures
+                if (attemptCount >= 10 || errorCount >= 3) {
+                    stopSimulation();
+                }
+                
+            }, 3000); // Check every 3 seconds
+        }
+
+        function stopSimulation() {
+            if (simulationInterval) {
+                clearInterval(simulationInterval);
+                simulationInterval = null;
+                
+                log('Session simulation stopped', 'info');
+                document.getElementById('stop-btn').disabled = true;
+                
+                const lifecycleResponse = document.getElementById('lifecycle-response').textContent;
+                if (lifecycleResponse.includes('Success rate: 100%') || lifecycleResponse.includes('Successful: 10')) {
+                    updateTestStatus('session-lifecycle', '✅ Step 5: Session Lifecycle Stable', 'Session persists over time', true);
+                    testResults.sessionLifecycle = 'success';
+                } else {
+                    updateTestStatus('session-lifecycle', '❌ Step 5: Session Lifecycle Unstable', 'Session drops over time', false);
+                    testResults.sessionLifecycle = 'error';
+                }
+            }
+        }
+
+        async function runFullTest() {
+            log('Starting full test suite...', 'info');
+            clearSession();
+            
+            await testLogin();
+            if (testResults.login === 'success') {
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                await testTokenPersistence();
+                
+                if (testResults.tokenPersistence === 'success') {
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                    await testAuthenticatedRequests();
+                    
+                    if (testResults.authRequests === 'success') {
+                        await new Promise(resolve => setTimeout(resolve, 1000));
+                        await testSessionValidation();
+                        
+                        if (testResults.sessionValidation === 'success') {
+                            await new Promise(resolve => setTimeout(resolve, 1000));
+                            simulateSessionLifecycle();
+                        }
+                    }
+                }
+            }
+            
+            generateSummary();
+        }
+
+        function clearSession() {
+            localStorage.removeItem('authToken');
+            sessionData = { token: null, user: null, loginTime: null };
+            updateSessionStatus();
+            log('Session cleared', 'info');
+            
+            // Reset all buttons
+            const buttons = document.querySelectorAll('.button');
+            buttons.forEach(btn => {
+                if (!btn.textContent.includes('Run Full Test') && 
+                    !btn.textContent.includes('Clear Session') && 
+                    !btn.textContent.includes('Copy Results') &&
+                    !btn.textContent.includes('Test Login')) {
+                    btn.disabled = true;
+                }
+            });
+        }
+
+        function generateSummary() {
+            const summaryDiv = document.getElementById('summary-content');
+            const results = testResults;
+            
+            const successCount = Object.values(results).filter(r => r === 'success').length;
+            const totalTests = Object.values(results).filter(r => r !== null).length;
+            
+            let html = '<h3>🎯 Session Test Results:</h3>';
+            
+            if (successCount === totalTests && totalTests >= 4) {
+                html += '<div style="background: #ecfdf5; padding: 15px; border-radius: 8px; border-left: 4px solid #10b981;">';
+                html += '<p><strong style="color: green;">🎉 ALL SESSION TESTS PASSED!</strong></p>';
+                html += '<p>Your backend session management is working perfectly. The issue is likely in your React app\'s authentication state management.</p>';
+                html += '<p><strong>Next steps for frontend:</strong></p>';
+                html += '<ol>';
+                html += '<li>Check AuthContext token storage and retrieval</li>';
+                html += '<li>Verify token is included in axios requests</li>';
+                html += '<li>Check for token expiration handling</li>';
+                html += '<li>Debug React authentication state persistence</li>';
+                html += '</ol>';
+                html += '</div>';
+            } else {
+                html += '<div style="background: #fef2f2; padding: 15px; border-radius: 8px; border-left: 4px solid #ef4444;">';
+                html += '<p><strong style="color: red;">⚠️ SESSION ISSUES DETECTED</strong></p>';
+                html += '<p>Session management problems found:</p>';
+                html += '<ul>';
+                if (results.login === 'error') html += '<li>❌ Login failing</li>';
+                if (results.tokenPersistence === 'error') html += '<li>❌ Token not persisting</li>';
+                if (results.authRequests === 'error') html += '<li>❌ Authenticated requests failing</li>';
+                if (results.sessionValidation === 'error') html += '<li>❌ Session validation inconsistent</li>';
+                if (results.sessionLifecycle === 'error') html += '<li>❌ Session not stable over time</li>';
+                html += '</ul>';
+                html += '</div>';
+            }
+            
+            html += '<h4>📋 Detailed Results:</h4>';
+            html += '<ul>';
+            html += `<li>Login: ${results.login === 'success' ? '✅ Working' : '❌ Failed'}</li>`;
+            html += `<li>Token Persistence: ${results.tokenPersistence === 'success' ? '✅ Working' : '❌ Failed'}</li>`;
+            html += `<li>Auth Requests: ${results.authRequests === 'success' ? '✅ Working' : '❌ Failed'}</li>`;
+            html += `<li>Session Validation: ${results.sessionValidation === 'success' ? '✅ Working' : '❌ Failed'}</li>`;
+            html += `<li>Session Lifecycle: ${results.sessionLifecycle === 'success' ? '✅ Stable' : (results.sessionLifecycle === 'error' ? '❌ Unstable' : '⏳ Not tested')}</li>`;
+            html += '</ul>';
+            
+            summaryDiv.innerHTML = html;
+        }
+
+        function copyResults() {
+            let report = 'ALVIN SESSION PERSISTENCE TEST REPORT\n';
+            report += '======================================\n';
+            report += `Generated: ${new Date().toISOString()}\n\n`;
+            
+            report += 'SESSION TEST RESULTS:\n';
+            report += `- Login: ${testResults.login || 'not tested'}\n`;
+            report += `- Token Persistence: ${testResults.tokenPersistence || 'not tested'}\n`;
+            report += `- Auth Requests: ${testResults.authRequests || 'not tested'}\n`;
+            report += `- Session Validation: ${testResults.sessionValidation || 'not tested'}\n`;
+            report += `- Session Lifecycle: ${testResults.sessionLifecycle || 'not tested'}\n\n`;
+            
+            if (sessionData.token) {
+                report += 'SESSION DATA:\n';
+                report += `- Token: ${sessionData.token.substring(0, 50)}...\n`;
+                report += `- User: ${sessionData.user?.email || 'Unknown'}\n`;
+                report += `- Login Time: ${sessionData.loginTime || 'Unknown'}\n\n`;
+            }
+            
+            const logArea = document.getElementById('test-log');
+            report += 'TEST LOG:\n';
+            report += logArea.textContent + '\n';
+            
+            navigator.clipboard.writeText(report).then(() => {
+                alert('Session test report copied to clipboard!');
+            });
+        }
+
+        // Initialize
+        window.addEventListener('load', () => {
+            log('Session persistence test tool loaded', 'info');
+            updateSessionStatus();
+        });
+    </script>
+</body>
+</html>

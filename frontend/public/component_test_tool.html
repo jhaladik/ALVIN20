@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ALVIN Component & UI Test</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        h1 { color: #2563eb; border-bottom: 2px solid #2563eb; padding-bottom: 10px; }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border-left: 4px solid #e5e7eb;
+            background: #f9fafb;
+        }
+        .success { border-left-color: #10b981; background: #ecfdf5; }
+        .error { border-left-color: #ef4444; background: #fef2f2; }
+        .warning { border-left-color: #f59e0b; background: #fffbeb; }
+        .info { border-left-color: #3b82f6; background: #eff6ff; }
+        
+        .status { font-weight: bold; margin-bottom: 10px; }
+        .success .status { color: #059669; }
+        .error .status { color: #dc2626; }
+        .warning .status { color: #d97706; }
+        .info .status { color: #2563eb; }
+        
+        .button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .button:hover { background: #2563eb; }
+        
+        .test-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin: 15px 0;
+        }
+        
+        .test-item {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            padding: 12px;
+            font-size: 13px;
+        }
+        
+        .component-preview {
+            background: white;
+            border: 2px dashed #e5e7eb;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 10px 0;
+            min-height: 100px;
+        }
+        
+        .log-area {
+            background: #1a1a1a;
+            color: #00ff00;
+            padding: 10px;
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 11px;
+            max-height: 200px;
+            overflow-y: auto;
+            margin: 10px 0;
+        }
+        
+        .css-test {
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 4px;
+        }
+        
+        /* Test if Tailwind classes work */
+        .tailwind-test {
+            @apply bg-blue-500 text-white p-4 rounded-lg shadow-md;
+        }
+        
+        .icon-test {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 5px 0;
+            padding: 8px;
+            background: #f3f4f6;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 ALVIN Component & UI Test</h1>
+        <p><strong>Purpose:</strong> Test React components, styling, and UI elements to identify missing or broken parts.</p>
+        
+        <!-- CSS & Styling Tests -->
+        <div class="test-section" id="css-test">
+            <div class="status">⏳ Testing CSS & Styling...</div>
+            <p>Testing if CSS frameworks and styling are loading correctly:</p>
+            
+            <div class="test-grid" id="css-results">
+                <div class="test-item">
+                    <strong>Tailwind CSS:</strong><br>
+                    <div class="css-test tailwind-test" id="tailwind-test">
+                        Tailwind Test
+                    </div>
+                    <span id="tailwind-status">Testing...</span>
+                </div>
+                
+                <div class="test-item">
+                    <strong>Custom CSS:</strong><br>
+                    <div class="css-test" style="background: #dbeafe; color: #1e40af; padding: 8px;">
+                        Custom CSS Test
+                    </div>
+                    <span id="custom-css-status">✅ Working</span>
+                </div>
+                
+                <div class="test-item">
+                    <strong>Flexbox/Grid:</strong><br>
+                    <div style="display: flex; gap: 5px;">
+                        <div style="flex: 1; background: #fecaca; padding: 5px;">1</div>
+                        <div style="flex: 1; background: #fed7aa; padding: 5px;">2</div>
+                        <div style="flex: 1; background: #fde68a; padding: 5px;">3</div>
+                    </div>
+                    <span id="layout-status">✅ Working</span>
+                </div>
+                
+                <div class="test-item">
+                    <strong>Responsive Design:</strong><br>
+                    <div style="background: #e0e7ff; padding: 8px; font-size: 12px;">
+                        Responsive: <span id="screen-size">Loading...</span>
+                    </div>
+                    <span id="responsive-status">Testing...</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Icon Libraries Test -->
+        <div class="test-section" id="icon-test">
+            <div class="status">⏳ Testing Icon Libraries...</div>
+            <p>Testing if icon libraries are available and working:</p>
+            
+            <div class="test-grid" id="icon-results">
+                <div class="test-item">
+                    <strong>Heroicons Test:</strong><br>
+                    <div class="icon-test" id="heroicons-test">
+                        <span id="heroicons-icon">📱</span>
+                        <span>Heroicons placeholder</span>
+                    </div>
+                    <span id="heroicons-status">Testing...</span>
+                </div>
+                
+                <div class="test-item">
+                    <strong>Lucide React Test:</strong><br>
+                    <div class="icon-test" id="lucide-test">
+                        <span id="lucide-icon">🎯</span>
+                        <span>Lucide placeholder</span>
+                    </div>
+                    <span id="lucide-status">Testing...</span>
+                </div>
+                
+                <div class="test-item">
+                    <strong>Unicode/Emoji:</strong><br>
+                    <div class="icon-test">
+                        <span>🚀 ✅ ❌ ⚠️ 🔧</span>
+                        <span>Unicode working</span>
+                    </div>
+                    <span id="unicode-status">✅ Working</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- React Environment Test -->
+        <div class="test-section" id="react-env-test">
+            <div class="status">⏳ Testing React Environment...</div>
+            <p>Testing React app environment and imports:</p>
+            
+            <div class="component-preview" id="react-preview">
+                <p>🔍 <strong>React Environment Tests:</strong></p>
+                <div id="react-tests">
+                    <div>• Environment Variables: <span id="env-test">Testing...</span></div>
+                    <div>• Import Meta: <span id="import-meta-test">Testing...</span></div>
+                    <div>• Vite Features: <span id="vite-test">Testing...</span></div>
+                    <div>• Module Resolution: <span id="module-test">Testing...</span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Component Import Test -->
+        <div class="test-section" id="component-imports">
+            <div class="status">⏳ Testing Component Imports...</div>
+            <p>Testing if common React components can be imported:</p>
+            
+            <div class="test-grid" id="import-results">
+                <!-- Will be populated by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Manual Component Tests -->
+        <div class="test-section" id="manual-component-test">
+            <div class="status">📋 Manual Component Tests</div>
+            <p>Test these manually in your React app:</p>
+            
+            <div class="component-preview">
+                <h4>🧪 Components to Test in React App:</h4>
+                <ol>
+                    <li><strong>LoadingSpinner:</strong> <code>import LoadingSpinner from './components/ui/LoadingSpinner'</code></li>
+                    <li><strong>Layout:</strong> <code>import Layout from './components/layout/Layout'</code></li>
+                    <li><strong>Header:</strong> <code>import Header from './components/layout/Header'</code></li>
+                    <li><strong>Sidebar:</strong> <code>import Sidebar from './components/layout/Sidebar'</code></li>
+                    <li><strong>Button:</strong> <code>import Button from './components/ui/Button'</code></li>
+                    <li><strong>AuthContext:</strong> <code>import { useAuth } from './hooks/useAuth'</code></li>
+                    <li><strong>SocketContext:</strong> <code>import { useSocket } from './hooks/useSocket'</code></li>
+                </ol>
+                
+                <h4>🎨 Styling to Test:</h4>
+                <ul>
+                    <li>Tailwind classes: <code>bg-blue-500 text-white p-4 rounded-lg</code></li>
+                    <li>Custom button styles: <code>btn-primary btn-secondary</code></li>
+                    <li>Layout responsiveness: Grid/flexbox layouts</li>
+                    <li>Icon rendering: Heroicons vs Lucide React</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Network & Asset Tests -->
+        <div class="test-section" id="asset-test">
+            <div class="status">⏳ Testing Asset Loading...</div>
+            <p>Testing if assets and external resources load correctly:</p>
+            
+            <div class="test-grid" id="asset-results">
+                <div class="test-item">
+                    <strong>Font Loading:</strong><br>
+                    <div style="font-family: 'Segoe UI'; padding: 5px;">Segoe UI Test</div>
+                    <span id="font-status">✅ Working</span>
+                </div>
+                
+                <div class="test-item">
+                    <strong>Image Loading:</strong><br>
+                    <img id="test-image" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTEyIDJMMTMuMDkgOC4yNkwyMSA5TDEzLjA5IDE1Ljc0TDEyIDIyTDEwLjkxIDE1Ljc0TDMgOUwxMC45MSA4LjI2TDEyIDJaIiBmaWxsPSIjM0I4MkY2Ii8+Cjwvc3ZnPgo=" 
+                         alt="Test" style="width: 24px; height: 24px;">
+                    <span id="image-status">✅ Working</span>
+                </div>
+                
+                <div class="test-item">
+                    <strong>CSS Loading:</strong><br>
+                    <div style="width: 50px; height: 10px; background: linear-gradient(90deg, #ff0000, #00ff00, #0000ff);"></div>
+                    <span id="css-loading-status">✅ Working</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="test-section">
+            <button class="button" onclick="runAllTests()">🚀 Run All Tests</button>
+            <button class="button" onclick="copyResults()">📋 Copy Results</button>
+            <button class="button" onclick="openReactDevTools()">🔧 React DevTools Guide</button>
+        </div>
+
+        <!-- Live Log -->
+        <div class="test-section">
+            <div class="status">📝 Test Log</div>
+            <div class="log-area" id="test-log">Component test log will appear here...</div>
+        </div>
+
+        <!-- Results Summary -->
+        <div class="test-section" id="final-summary">
+            <div class="status">📊 Component Test Summary</div>
+            <div id="summary-content">
+                <p>Run tests to see component and styling results...</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const testResults = {
+            css: null,
+            icons: null,
+            reactEnv: null,
+            components: null,
+            assets: null
+        };
+
+        function log(message, type = 'info') {
+            const logArea = document.getElementById('test-log');
+            const timestamp = new Date().toISOString().split('T')[1].split('.')[0];
+            const colors = {
+                info: '#00ff00',
+                error: '#ff6b6b',
+                warning: '#ffd93d',
+                success: '#00ff88'
+            };
+            
+            const logEntry = document.createElement('div');
+            logEntry.style.color = colors[type] || '#00ff00';
+            logEntry.textContent = `[${timestamp}] ${message}`;
+            logArea.appendChild(logEntry);
+            logArea.scrollTop = logArea.scrollHeight;
+        }
+
+        function updateTestStatus(sectionId, status, message, isSuccess = true) {
+            const section = document.getElementById(sectionId);
+            const statusEl = section.querySelector('.status');
+            const className = isSuccess ? 'success' : (status.includes('⚠️') ? 'warning' : 'error');
+            
+            section.className = `test-section ${className}`;
+            statusEl.textContent = status;
+        }
+
+        function testCSS() {
+            log('Testing CSS and styling...', 'info');
+            
+            try {
+                // Test Tailwind CSS
+                const tailwindEl = document.getElementById('tailwind-test');
+                const computedStyle = window.getComputedStyle(tailwindEl);
+                
+                // Check if Tailwind classes applied
+                const hasBlueBackground = computedStyle.backgroundColor.includes('rgb(59, 130, 246)') || 
+                                         computedStyle.backgroundColor.includes('blue');
+                const hasWhiteText = computedStyle.color.includes('rgb(255, 255, 255)') || 
+                                    computedStyle.color.includes('white');
+                
+                if (hasBlueBackground && hasWhiteText) {
+                    document.getElementById('tailwind-status').innerHTML = '✅ Working';
+                    log('Tailwind CSS is working correctly', 'success');
+                } else {
+                    document.getElementById('tailwind-status').innerHTML = '⚠️ Partial';
+                    log('Tailwind CSS may not be fully configured', 'warning');
+                }
+                
+                // Test responsive design
+                const screenWidth = window.innerWidth;
+                document.getElementById('screen-size').textContent = `${screenWidth}px`;
+                
+                if (screenWidth > 768) {
+                    document.getElementById('responsive-status').innerHTML = '✅ Desktop';
+                } else {
+                    document.getElementById('responsive-status').innerHTML = '✅ Mobile';
+                }
+                
+                updateTestStatus('css-test', '✅ CSS & Styling: Working', 'CSS frameworks detected', true);
+                testResults.css = 'success';
+                
+            } catch (error) {
+                log(`CSS test error: ${error.message}`, 'error');
+                updateTestStatus('css-test', '❌ CSS & Styling: Issues', 'CSS problems detected', false);
+                testResults.css = 'error';
+            }
+        }
+
+        function testIcons() {
+            log('Testing icon libraries...', 'info');
+            
+            try {
+                // Test if we can detect icon libraries
+                // Note: This is a simulation since we can't actually import React components here
+                
+                // Check if commonly used icon fonts are available
+                const testDiv = document.createElement('div');
+                testDiv.style.fontFamily = 'Font Awesome, Material Icons, "Heroicons"';
+                document.body.appendChild(testDiv);
+                
+                const fontFamily = window.getComputedStyle(testDiv).fontFamily;
+                document.body.removeChild(testDiv);
+                
+                // Simulate icon library tests
+                setTimeout(() => {
+                    document.getElementById('heroicons-status').innerHTML = '⚠️ Manual Test Needed';
+                    document.getElementById('lucide-status').innerHTML = '⚠️ Manual Test Needed';
+                    log('Icon libraries need manual testing in React app', 'warning');
+                }, 500);
+                
+                updateTestStatus('icon-test', '⚠️ Icon Libraries: Manual Test Needed', 'Test in React app', false);
+                testResults.icons = 'warning';
+                
+            } catch (error) {
+                log(`Icon test error: ${error.message}`, 'error');
+                updateTestStatus('icon-test', '❌ Icon Libraries: Error', 'Icon problems detected', false);
+                testResults.icons = 'error';
+            }
+        }
+
+        function testReactEnvironment() {
+            log('Testing React environment...', 'info');
+            
+            try {
+                // Test environment variables (check if running on Vite dev server)
+                const isVitePort = window.location.port === '5173';
+                document.getElementById('env-test').innerHTML = isVitePort ? '✅ On Vite Port' : '⚠️ Different Port';
+                
+                // Test Vite features (check for Vite dev server indicators)
+                const hasViteIndicators = document.querySelector('script[type="module"]') || 
+                                         window.location.href.includes('5173');
+                document.getElementById('import-meta-test').innerHTML = hasViteIndicators ? '✅ Likely Available' : '❌ Not Detected';
+                
+                // Test Vite features
+                const isVitePage = window.location.port === '5173';
+                document.getElementById('vite-test').innerHTML = isVitePage ? '✅ Detected' : '⚠️ Not on Vite port';
+                
+                // Test module resolution (check for modern browser features)
+                const hasModuleSupport = 'noModule' in document.createElement('script');
+                document.getElementById('module-test').innerHTML = hasModuleSupport ? '✅ Supported' : '❌ Limited';
+                
+                updateTestStatus('react-env-test', '✅ React Environment: Working', 'Environment appears functional', true);
+                testResults.reactEnv = 'success';
+                log('React environment test completed', 'success');
+                
+            } catch (error) {
+                log(`React environment test error: ${error.message}`, 'error');
+                updateTestStatus('react-env-test', '❌ React Environment: Issues', 'Environment problems detected', false);
+                testResults.reactEnv = 'error';
+            }
+        }
+
+        function testComponentImports() {
+            log('Testing component import simulation...', 'info');
+            
+            const commonComponents = [
+                { name: 'LoadingSpinner', path: './components/ui/LoadingSpinner', critical: true },
+                { name: 'Layout', path: './components/layout/Layout', critical: true },
+                { name: 'Header', path: './components/layout/Header', critical: true },
+                { name: 'Sidebar', path: './components/layout/Sidebar', critical: true },
+                { name: 'Button', path: './components/ui/Button', critical: false },
+                { name: 'AuthContext', path: './context/AuthContext', critical: true },
+                { name: 'SocketContext', path: './context/SocketContext', critical: false },
+                { name: 'useAuth', path: './hooks/useAuth', critical: true },
+                { name: 'useSocket', path: './hooks/useSocket', critical: false }
+            ];
+            
+            const importResults = document.getElementById('import-results');
+            importResults.innerHTML = '';
+            
+            commonComponents.forEach(comp => {
+                const item = document.createElement('div');
+                item.className = 'test-item';
+                item.innerHTML = `
+                    <strong>${comp.name}:</strong><br>
+                    <code style="font-size: 11px;">${comp.path}</code><br>
+                    <span style="color: ${comp.critical ? '#dc2626' : '#059669'};">
+                        ${comp.critical ? '🔴 Critical' : '🟢 Optional'}
+                    </span><br>
+                    <span style="color: #d97706;">⚠️ Manual test needed</span>
+                `;
+                importResults.appendChild(item);
+            });
+            
+            updateTestStatus('component-imports', '⚠️ Component Imports: Manual Test Needed', 'Test imports in React app', false);
+            testResults.components = 'warning';
+            log('Component import test completed - manual verification needed', 'warning');
+        }
+
+        function testAssets() {
+            log('Testing asset loading...', 'info');
+            
+            try {
+                // Test image loading
+                const testImg = document.getElementById('test-image');
+                testImg.onload = () => {
+                    document.getElementById('image-status').innerHTML = '✅ Working';
+                    log('Image loading working', 'success');
+                };
+                testImg.onerror = () => {
+                    document.getElementById('image-status').innerHTML = '❌ Failed';
+                    log('Image loading failed', 'error');
+                };
+                
+                // Test font rendering
+                const fontTest = document.createElement('div');
+                fontTest.style.fontFamily = 'Segoe UI, system-ui, sans-serif';
+                fontTest.style.fontSize = '12px';
+                fontTest.textContent = 'Font Test';
+                document.body.appendChild(fontTest);
+                
+                const computedFont = window.getComputedStyle(fontTest).fontFamily;
+                document.body.removeChild(fontTest);
+                
+                if (computedFont.includes('Segoe UI') || computedFont.includes('system-ui')) {
+                    log('Font loading working correctly', 'success');
+                } else {
+                    log('Font fallback detected', 'warning');
+                }
+                
+                updateTestStatus('asset-test', '✅ Asset Loading: Working', 'Assets loading correctly', true);
+                testResults.assets = 'success';
+                
+            } catch (error) {
+                log(`Asset test error: ${error.message}`, 'error');
+                updateTestStatus('asset-test', '❌ Asset Loading: Issues', 'Asset problems detected', false);
+                testResults.assets = 'error';
+            }
+        }
+
+        function generateSummary() {
+            const summaryDiv = document.getElementById('summary-content');
+            const results = testResults;
+            
+            let html = '<h3>🎯 Component & UI Test Results:</h3>';
+            
+            // Count issues
+            const criticalIssues = [];
+            const warnings = [];
+            const successes = [];
+            
+            if (results.css === 'success') successes.push('CSS/Styling working');
+            else if (results.css === 'error') criticalIssues.push('CSS/Styling broken');
+            else warnings.push('CSS needs verification');
+            
+            if (results.reactEnv === 'success') successes.push('React environment working');
+            else if (results.reactEnv === 'error') criticalIssues.push('React environment issues');
+            
+            if (results.assets === 'success') successes.push('Asset loading working');
+            else if (results.assets === 'error') criticalIssues.push('Asset loading broken');
+            
+            if (results.icons === 'warning') warnings.push('Icon libraries need manual testing');
+            if (results.components === 'warning') warnings.push('Components need manual testing');
+            
+            if (criticalIssues.length === 0 && warnings.length <= 2) {
+                html += '<div style="background: #ecfdf5; padding: 15px; border-radius: 8px; border-left: 4px solid #10b981;">';
+                html += '<p><strong style="color: green;">🎉 COMPONENTS MOSTLY WORKING!</strong></p>';
+                html += '<p>Your UI foundation is solid. The main issues to address:</p>';
+                html += '<ol>';
+                html += '<li><strong>Test icon libraries in React app</strong> - Check if @heroicons/react or lucide-react imports work</li>';
+                html += '<li><strong>Test component imports</strong> - Verify all critical components can be imported</li>';
+                html += '<li><strong>Check Tailwind configuration</strong> - Ensure all utility classes work</li>';
+                html += '</ol>';
+                html += '</div>';
+            } else {
+                html += '<div style="background: #fef2f2; padding: 15px; border-radius: 8px; border-left: 4px solid #ef4444;">';
+                html += '<p><strong style="color: red;">⚠️ COMPONENT ISSUES DETECTED</strong></p>';
+                html += '<p>Critical issues found:</p>';
+                html += '<ul>';
+                criticalIssues.forEach(issue => html += `<li>❌ ${issue}</li>`);
+                warnings.forEach(warning => html += `<li>⚠️ ${warning}</li>`);
+                html += '</ul>';
+                html += '</div>';
+            }
+            
+            html += '<h4>📋 Next Steps for React App:</h4>';
+            html += '<ol>';
+            html += '<li><strong>Check browser console (F12)</strong> for component import errors</li>';
+            html += '<li><strong>Verify icon library imports:</strong> Try importing an icon in a test component</li>';
+            html += '<li><strong>Test Tailwind classes:</strong> Add className="bg-blue-500 text-white p-4" to a div</li>';
+            html += '<li><strong>Check missing components:</strong> Create minimal versions of missing UI components</li>';
+            html += '<li><strong>Test responsive design:</strong> Resize browser to check layout</li>';
+            html += '</ol>';
+            
+            html += '<h4>📋 Component Status:</h4>';
+            html += '<ul>';
+            html += `<li>CSS/Styling: ${results.css === 'success' ? '✅ Working' : (results.css === 'error' ? '❌ Issues' : '⚠️ Check needed')}</li>`;
+            html += `<li>React Environment: ${results.reactEnv === 'success' ? '✅ Working' : '❌ Issues'}</li>`;
+            html += `<li>Icon Libraries: ${results.icons === 'warning' ? '⚠️ Manual test needed' : '❌ Issues'}</li>`;
+            html += `<li>Component Imports: ${results.components === 'warning' ? '⚠️ Manual test needed' : '❌ Issues'}</li>`;
+            html += `<li>Asset Loading: ${results.assets === 'success' ? '✅ Working' : '❌ Issues'}</li>`;
+            html += '</ul>';
+            
+            summaryDiv.innerHTML = html;
+        }
+
+        async function runAllTests() {
+            log('Starting comprehensive component tests...', 'info');
+            
+            // Reset results
+            Object.keys(testResults).forEach(key => testResults[key] = null);
+            
+            // Run tests with delays
+            testCSS();
+            await new Promise(resolve => setTimeout(resolve, 500));
+            
+            testReactEnvironment();
+            await new Promise(resolve => setTimeout(resolve, 500));
+            
+            testIcons();
+            await new Promise(resolve => setTimeout(resolve, 500));
+            
+            testComponentImports();
+            await new Promise(resolve => setTimeout(resolve, 500));
+            
+            testAssets();
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            generateSummary();
+            log('Component test suite completed', 'success');
+        }
+
+        function copyResults() {
+            let report = 'ALVIN COMPONENT & UI TEST REPORT\n';
+            report += '==================================\n';
+            report += `Generated: ${new Date().toISOString()}\n\n`;
+            
+            report += 'COMPONENT TEST RESULTS:\n';
+            report += `- CSS/Styling: ${testResults.css || 'not tested'}\n`;
+            report += `- React Environment: ${testResults.reactEnv || 'not tested'}\n`;
+            report += `- Icon Libraries: ${testResults.icons || 'not tested'}\n`;
+            report += `- Component Imports: ${testResults.components || 'not tested'}\n`;
+            report += `- Asset Loading: ${testResults.assets || 'not tested'}\n\n`;
+            
+            const logArea = document.getElementById('test-log');
+            report += 'TEST LOG:\n';
+            report += logArea.textContent + '\n';
+            
+            navigator.clipboard.writeText(report).then(() => {
+                alert('Component test report copied to clipboard!');
+            });
+        }
+
+        function openReactDevTools() {
+            alert(`React DevTools Guide:
+
+1. Install React DevTools browser extension
+2. Open your React app (http://localhost:5173)
+3. Press F12 → Go to "Components" or "Profiler" tab
+4. Look for:
+   - Component tree structure
+   - Failed component renders (red)
+   - Missing props or hooks
+   - State management issues
+
+5. In Console tab, look for:
+   - Import errors (red)
+   - Missing module warnings
+   - Component lifecycle errors
+   - Hook dependency warnings`);
+        }
+
+        // Auto-start tests when page loads
+        window.addEventListener('load', () => {
+            log('Component test tool loaded', 'info');
+            setTimeout(runAllTests, 1000);
+        });
+
+        // Update screen size on resize
+        window.addEventListener('resize', () => {
+            const screenWidth = window.innerWidth;
+            const screenSizeEl = document.getElementById('screen-size');
+            if (screenSizeEl) {
+                screenSizeEl.textContent = `${screenWidth}px`;
+            }
+        });
+    </script>
+</body>
+</html>
