@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔧 ALVIN Backend Diagnostic Tool</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f8fafc;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 24px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            text-align: center;
+        }
+        .summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .summary-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .summary-number {
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+        .summary-label {
+            color: #6b7280;
+            font-size: 14px;
+        }
+        .test-controls {
+            background: white;
+            padding: 24px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 24px;
+        }
+        .controls-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+        .input-group {
+            display: flex;
+            flex-direction: column;
+        }
+        .input-group label {
+            font-weight: 500;
+            margin-bottom: 4px;
+            color: #374151;
+        }
+        .input-group input {
+            padding: 8px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        button:hover { background: #2563eb; }
+        button:disabled { background: #9ca3af; cursor: not-allowed; }
+        .test-button {
+            background: #059669;
+            padding: 16px 32px;
+            font-size: 16px;
+        }
+        .endpoint-results {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 16px;
+        }
+        .endpoint-card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .endpoint-header {
+            padding: 16px;
+            background: #f9fafb;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: between;
+            align-items: center;
+        }
+        .endpoint-title {
+            font-weight: 600;
+            color: #111827;
+        }
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        .status-success { background: #d1fae5; color: #065f46; }
+        .status-error { background: #fee2e2; color: #991b1b; }
+        .status-warning { background: #fef3c7; color: #92400e; }
+        .status-pending { background: #e0e7ff; color: #3730a3; }
+        .endpoint-body {
+            padding: 16px;
+        }
+        .endpoint-details {
+            font-family: monospace;
+            font-size: 12px;
+            background: #f9fafb;
+            padding: 12px;
+            border-radius: 4px;
+            margin-top: 8px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .fix-suggestions {
+            background: #fef3c7;
+            border: 1px solid #f59e0b;
+            border-radius: 6px;
+            padding: 12px;
+            margin-top: 12px;
+        }
+        .fix-title {
+            font-weight: 600;
+            color: #92400e;
+            margin-bottom: 8px;
+        }
+        .fix-text {
+            font-size: 13px;
+            color: #451a03;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🔧 ALVIN Backend Diagnostic Tool</h1>
+        <p>Test all backend endpoints and identify missing routes, CORS issues, and other problems</p>
+    </div>
+
+    <div class="summary" id="summary">
+        <div class="summary-card">
+            <div class="summary-number" id="total-endpoints">-</div>
+            <div class="summary-label">Total Endpoints</div>
+        </div>
+        <div class="summary-card">
+            <div class="summary-number" id="working-endpoints">-</div>
+            <div class="summary-label">Working</div>
+        </div>
+        <div class="summary-card">
+            <div class="summary-number" id="failed-endpoints">-</div>
+            <div class="summary-label">Failed</div>
+        </div>
+        <div class="summary-card">
+            <div class="summary-number" id="avg-response-time">-</div>
+            <div class="summary-label">Avg Response (ms)</div>
+        </div>
+    </div>
+
+    <div class="test-controls">
+        <div class="controls-grid">
+            <div class="input-group">
+                <label for="backendUrl">Backend URL:</label>
+                <input type="text" id="backendUrl" value="http://localhost:5000" placeholder="Backend URL">
+            </div>
+            <div class="input-group">
+                <label for="authToken">JWT Token (optional):</label>
+                <input type="text" id="authToken" placeholder="JWT token for authenticated endpoints">
+            </div>
+            <div class="input-group">
+                <label for="testEmail">Test Email:</label>
+                <input type="text" id="testEmail" value="demo@alvin.ai" placeholder="Email for login test">
+            </div>
+            <div class="input-group">
+                <label for="testPassword">Test Password:</label>
+                <input type="password" id="testPassword" value="demo123" placeholder="Password for login test">
+            </div>
+        </div>
+        <button class="test-button" onclick="runAllTests()">🚀 Test All Endpoints</button>
+    </div>
+
+    <div class="endpoint-results" id="results"></div>
+
+    <script>
+        const endpoints = [
+            // Basic endpoints
+            { method: 'GET', path: '/health', name: 'Health Check', auth: false },
+            { method: 'GET', path: '/api', name: 'API Info', auth: false },
+            { method: 'GET', path: '/', name: 'Root', auth: false },
+            
+            // Auth endpoints
+            { method: 'POST', path: '/api/auth/login', name: 'Login', auth: false, 
+              data: () => ({ email: document.getElementById('testEmail').value, password: document.getElementById('testPassword').value }) },
+            { method: 'GET', path: '/api/auth/me', name: 'Profile', auth: true },
+            
+            // Projects endpoints
+            { method: 'GET', path: '/api/projects', name: 'List Projects', auth: true },
+            { method: 'POST', path: '/api/projects', name: 'Create Project', auth: true, 
+              data: () => ({ title: 'Test Project ' + Date.now(), description: 'Test project description' }) },
+            
+            // Analytics endpoints
+            { method: 'GET', path: '/api/analytics/dashboard', name: 'Analytics Dashboard', auth: true },
+            { method: 'GET', path: '/api/analytics/recent-activity?limit=10', name: 'Recent Activity', auth: true },
+            
+            // Scene endpoints
+            { method: 'GET', path: '/api/scenes', name: 'List Scenes', auth: true },
+            
+            // Other endpoints
+            { method: 'GET', path: '/api/billing/plans', name: 'Billing Plans', auth: false },
+            { method: 'GET', path: '/api/billing/subscription', name: 'User Subscription', auth: true },
+        ];
+
+        let testResults = [];
+        let authToken = '';
+
+        async function testEndpoint(endpoint) {
+            const backendUrl = document.getElementById('backendUrl').value.replace(/\/$/, '');
+            const startTime = Date.now();
+            
+            try {
+                const headers = {
+                    'Content-Type': 'application/json'
+                };
+                
+                // Add auth token if required
+                if (endpoint.auth && authToken) {
+                    headers['Authorization'] = `Bearer ${authToken}`;
+                } else if (endpoint.auth && !authToken) {
+                    // Try to get token from input
+                    const inputToken = document.getElementById('authToken').value.trim();
+                    if (inputToken) {
+                        headers['Authorization'] = `Bearer ${inputToken}`;
+                    }
+                }
+                
+                const requestOptions = {
+                    method: endpoint.method,
+                    headers: headers
+                };
+                
+                // Add data for POST requests
+                if (endpoint.data && (endpoint.method === 'POST' || endpoint.method === 'PUT')) {
+                    requestOptions.body = JSON.stringify(endpoint.data());
+                }
+                
+                const response = await fetch(`${backendUrl}${endpoint.path}`, requestOptions);
+                const responseTime = Date.now() - startTime;
+                
+                let responseData = '';
+                try {
+                    responseData = await response.text();
+                    // Try to parse as JSON
+                    JSON.parse(responseData);
+                } catch (e) {
+                    // Not JSON, that's OK
+                }
+                
+                const result = {
+                    endpoint: endpoint,
+                    success: response.ok,
+                    status: response.status,
+                    statusText: response.statusText,
+                    responseTime: responseTime,
+                    responseData: responseData.substring(0, 500),
+                    headers: Object.fromEntries(response.headers.entries())
+                };
+                
+                // Special handling for login endpoint
+                if (endpoint.path === '/api/auth/login' && response.ok) {
+                    try {
+                        const loginData = JSON.parse(responseData);
+                        if (loginData.access_token) {
+                            authToken = loginData.access_token;
+                            document.getElementById('authToken').value = authToken;
+                        }
+                    } catch (e) {
+                        console.error('Failed to parse login response:', e);
+                    }
+                }
+                
+                return result;
+                
+            } catch (error) {
+                return {
+                    endpoint: endpoint,
+                    success: false,
+                    status: 0,
+                    statusText: 'Network Error',
+                    responseTime: Date.now() - startTime,
+                    error: error.message,
+                    responseData: ''
+                };
+            }
+        }
+
+        function getStatusClass(result) {
+            if (result.success) return 'status-success';
+            if (result.status === 401 && result.endpoint.auth) return 'status-warning';
+            return 'status-error';
+        }
+
+        function getStatusText(result) {
+            if (result.success) return 'Working';
+            if (result.status === 401 && result.endpoint.auth) return 'Auth Required';
+            if (result.status === 404) return 'Not Found';
+            if (result.status === 0) return 'Network Error';
+            return `Error ${result.status}`;
+        }
+
+        function getFixSuggestions(result) {
+            if (result.success) return '';
+            
+            let suggestions = [];
+            
+            if (result.status === 404) {
+                suggestions.push('• Blueprint not registered in Flask app');
+                suggestions.push('• Check route definition in backend/app/routes/');
+                suggestions.push('• Verify URL path matches route definition');
+            } else if (result.status === 0 || result.error === 'Network Error') {
+                suggestions.push('• Backend server is not running');
+                suggestions.push('• Check CORS configuration');
+                suggestions.push('• Verify backend URL is correct');
+            } else if (result.status === 401) {
+                if (result.endpoint.auth) {
+                    suggestions.push('• Expected - endpoint requires authentication');
+                    suggestions.push('• Login first to get JWT token');
+                } else {
+                    suggestions.push('• Unexpected auth requirement');
+                    suggestions.push('• Check route decorator (@jwt_required)');
+                }
+            } else if (result.status === 500) {
+                suggestions.push('• Server-side error in route handler');
+                suggestions.push('• Check backend logs for details');
+                suggestions.push('• Verify database connection');
+            }
+            
+            return suggestions.join('\n');
+        }
+
+        function displayResults() {
+            const resultsContainer = document.getElementById('results');
+            resultsContainer.innerHTML = '';
+            
+            testResults.forEach(result => {
+                const card = document.createElement('div');
+                card.className = 'endpoint-card';
+                
+                const statusClass = getStatusClass(result);
+                const statusText = getStatusText(result);
+                const fixSuggestions = getFixSuggestions(result);
+                
+                card.innerHTML = `
+                    <div class="endpoint-header">
+                        <div class="endpoint-title">${result.endpoint.method} ${result.endpoint.name}</div>
+                        <div class="status-badge ${statusClass}">${statusText}</div>
+                    </div>
+                    <div class="endpoint-body">
+                        <div><strong>Path:</strong> ${result.endpoint.path}</div>
+                        <div><strong>Status:</strong> ${result.status} ${result.statusText}</div>
+                        <div><strong>Response Time:</strong> ${result.responseTime}ms</div>
+                        ${result.endpoint.auth ? '<div><strong>Auth:</strong> Required</div>' : ''}
+                        
+                        ${result.responseData ? `
+                            <div class="endpoint-details">
+                                <strong>Response:</strong><br>
+                                ${result.responseData}
+                            </div>
+                        ` : ''}
+                        
+                        ${result.error ? `
+                            <div class="endpoint-details">
+                                <strong>Error:</strong><br>
+                                ${result.error}
+                            </div>
+                        ` : ''}
+                        
+                        ${fixSuggestions ? `
+                            <div class="fix-suggestions">
+                                <div class="fix-title">💡 Fix Suggestions:</div>
+                                <div class="fix-text">${fixSuggestions.replace(/\n/g, '<br>')}</div>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+                
+                resultsContainer.appendChild(card);
+            });
+        }
+
+        function updateSummary() {
+            const total = testResults.length;
+            const working = testResults.filter(r => r.success).length;
+            const failed = total - working;
+            const avgResponseTime = testResults.reduce((sum, r) => sum + r.responseTime, 0) / total;
+            
+            document.getElementById('total-endpoints').textContent = total;
+            document.getElementById('working-endpoints').textContent = working;
+            document.getElementById('failed-endpoints').textContent = failed;
+            document.getElementById('avg-response-time').textContent = Math.round(avgResponseTime);
+        }
+
+        async function runAllTests() {
+            testResults = [];
+            document.getElementById('results').innerHTML = '<div style="text-align: center; padding: 40px;">🔄 Testing endpoints...</div>';
+            
+            // First, try to login to get auth token
+            const loginEndpoint = endpoints.find(e => e.path === '/api/auth/login');
+            if (loginEndpoint) {
+                const loginResult = await testEndpoint(loginEndpoint);
+                testResults.push(loginResult);
+                displayResults();
+                updateSummary();
+            }
+            
+            // Test all other endpoints
+            for (const endpoint of endpoints) {
+                if (endpoint.path === '/api/auth/login') continue; // Already tested
+                
+                const result = await testEndpoint(endpoint);
+                testResults.push(result);
+                displayResults();
+                updateSummary();
+                
+                // Small delay to avoid overwhelming the server
+                await new Promise(resolve => setTimeout(resolve, 100));
+            }
+            
+            console.log('All tests completed:', testResults);
+        }
+
+        // Auto-populate backend URL
+        window.addEventListener('load', () => {
+            const currentHost = window.location.host;
+            if (currentHost.includes('localhost') || currentHost.includes('127.0.0.1')) {
+                document.getElementById('backendUrl').value = 'http://localhost:5000';
+            }
+        });
+    </script>
+</body>
+</html>

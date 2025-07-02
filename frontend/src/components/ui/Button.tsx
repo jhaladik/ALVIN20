@@ -1,5 +1,6 @@
-// File: src/components/ui/Button.tsx
+// ===== FIXED Button.tsx =====
 import { ReactNode } from 'react'
+import LoadingSpinner from './LoadingSpinner' // ✅ ADD THIS IMPORT
 
 type ButtonVariant = 'primary' | 'secondary' | 'success' | 'danger' | 'ghost'
 type ButtonSize = 'sm' | 'md' | 'lg'

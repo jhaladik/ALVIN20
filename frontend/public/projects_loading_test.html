@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ALVIN Projects Loading Test Suite</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8fafc;
+            color: #1a202c;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        h1 {
+            color: #2d3748;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .test-section {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .test-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 1rem;
+        }
+
+        .test-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .test-controls {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        button {
+            background: #4c51bf;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 0.75rem 1.5rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        button:hover {
+            background: #434190;
+            transform: translateY(-1px);
+        }
+
+        button:disabled {
+            background: #a0aec0;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-danger {
+            background: #e53e3e;
+        }
+
+        .btn-danger:hover {
+            background: #c53030;
+        }
+
+        .btn-success {
+            background: #38a169;
+        }
+
+        .btn-success:hover {
+            background: #2f855a;
+        }
+
+        .status {
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            font-weight: 500;
+        }
+
+        .status.loading {
+            background: #ebf8ff;
+            color: #2b6cb0;
+            border: 1px solid #bee3f8;
+        }
+
+        .status.success {
+            background: #f0fff4;
+            color: #2f855a;
+            border: 1px solid #9ae6b4;
+        }
+
+        .status.error {
+            background: #fed7d7;
+            color: #c53030;
+            border: 1px solid #feb2b2;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #4c51bf;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 0.5rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .project-card {
+            background: #f7fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 1.5rem;
+            transition: all 0.2s;
+        }
+
+        .project-card:hover {
+            border-color: #4c51bf;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .project-title {
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 0.5rem;
+        }
+
+        .project-description {
+            color: #718096;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .project-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.75rem;
+            color: #a0aec0;
+        }
+
+        .logs {
+            background: #1a202c;
+            color: #f7fafc;
+            border-radius: 8px;
+            padding: 1rem;
+            height: 200px;
+            overflow-y: auto;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.875rem;
+            margin-top: 1rem;
+        }
+
+        .log-entry {
+            margin-bottom: 0.5rem;
+            padding: 0.25rem 0;
+        }
+
+        .log-entry.error {
+            color: #feb2b2;
+        }
+
+        .log-entry.success {
+            color: #9ae6b4;
+        }
+
+        .log-entry.info {
+            color: #90cdf4;
+        }
+
+        .filters {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            align-items: center;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        label {
+            font-weight: 500;
+            color: #4a5568;
+            font-size: 0.875rem;
+        }
+
+        select, input {
+            padding: 0.5rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 0.875rem;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-card {
+            background: #f7fafc;
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #4c51bf;
+        }
+
+        .stat-label {
+            color: #718096;
+            font-size: 0.875rem;
+        }
+
+        .component-test {
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+
+        .component-test h4 {
+            margin-bottom: 1rem;
+            color: #2d3748;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 ALVIN Projects Loading Test Suite</h1>
+
+        <!-- API Connection Test -->
+        <div class="test-section">
+            <div class="test-header">
+                <h2 class="test-title">📡 API Connection Test</h2>
+            </div>
+            <div class="test-controls">
+                <button onclick="testAPIConnection()">Test API Connection</button>
+                <button onclick="testAuthEndpoint()">Test Auth Endpoint</button>
+                <button onclick="testProjectsEndpoint()">Test Projects Endpoint</button>
+            </div>
+            <div id="api-status" class="status">Ready to test API connection</div>
+            <div class="logs" id="api-logs"></div>
+        </div>
+
+        <!-- Loading States Test -->
+        <div class="test-section">
+            <div class="test-header">
+                <h2 class="test-title">⏳ Loading States Test</h2>
+            </div>
+            <div class="test-controls">
+                <button onclick="simulateLoadingState()">Simulate Loading</button>
+                <button onclick="simulateSuccessState()">Simulate Success</button>
+                <button onclick="simulateErrorState()" class="btn-danger">Simulate Error</button>
+                <button onclick="resetLoadingTest()">Reset</button>
+            </div>
+            
+            <div class="component-test">
+                <h4>LoadingSpinner Component Test</h4>
+                <div id="loading-spinner-test">
+                    <div style="display: flex; gap: 2rem; align-items: center;">
+                        <div>
+                            <p>Small: <span class="loading-spinner" style="width: 16px; height: 16px; border-width: 2px;"></span></p>
+                        </div>
+                        <div>
+                            <p>Medium: <span class="loading-spinner"></span></p>
+                        </div>
+                        <div>
+                            <p>Large: <span class="loading-spinner" style="width: 32px; height: 32px; border-width: 4px;"></span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="projects-loading-state" class="status">Click a button to test loading states</div>
+            <div id="projects-container"></div>
+        </div>
+
+        <!-- Projects Grid Test -->
+        <div class="test-section">
+            <div class="test-header">
+                <h2 class="test-title">📋 Projects Grid Test</h2>
+            </div>
+            <div class="test-controls">
+                <button onclick="loadMockProjects()">Load Mock Projects</button>
+                <button onclick="loadEmptyProjects()">Test Empty State</button>
+                <button onclick="loadLargeDataset()">Load Large Dataset</button>
+                <button onclick="clearProjects()" class="btn-danger">Clear Projects</button>
+            </div>
+
+            <div class="filters">
+                <div class="filter-group">
+                    <label>Filter:</label>
+                    <select id="project-filter" onchange="applyFilters()">
+                        <option value="all">All Projects</option>
+                        <option value="recent">Recent</option>
+                        <option value="idea">Ideas</option>
+                        <option value="story">Stories</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Sort:</label>
+                    <select id="project-sort" onchange="applyFilters()">
+                        <option value="updated">Last Updated</option>
+                        <option value="newest">Newest</option>
+                        <option value="oldest">Oldest</option>
+                        <option value="alphabetical">Alphabetical</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Search:</label>
+                    <input type="text" id="project-search" placeholder="Search projects..." oninput="applyFilters()">
+                </div>
+            </div>
+
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="stat-value" id="total-projects">0</div>
+                    <div class="stat-label">Total Projects</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="filtered-projects">0</div>
+                    <div class="stat-label">Filtered Results</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="load-time">0ms</div>
+                    <div class="stat-label">Load Time</div>
+                </div>
+            </div>
+
+            <div id="projects-grid" class="projects-grid"></div>
+        </div>
+
+        <!-- Component Error Boundary Test -->
+        <div class="test-section">
+            <div class="test-header">
+                <h2 class="test-title">🛡️ Error Handling Test</h2>
+            </div>
+            <div class="test-controls">
+                <button onclick="triggerComponentError()" class="btn-danger">Trigger Component Error</button>
+                <button onclick="triggerNetworkError()" class="btn-danger">Trigger Network Error</button>
+                <button onclick="triggerAuthError()" class="btn-danger">Trigger Auth Error</button>
+                <button onclick="clearErrors()" class="btn-success">Clear Errors</button>
+            </div>
+            <div id="error-boundary" class="status">No errors - System healthy</div>
+        </div>
+
+        <!-- Performance Test -->
+        <div class="test-section">
+            <div class="test-header">
+                <h2 class="test-title">⚡ Performance Test</h2>
+            </div>
+            <div class="test-controls">
+                <button onclick="performanceTest()">Run Performance Test</button>
+                <button onclick="memoryLeakTest()">Memory Leak Test</button>
+                <button onclick="stressTest()">Stress Test (1000 items)</button>
+            </div>
+            <div id="performance-results" class="status">Ready to run performance tests</div>
+            <div class="logs" id="performance-logs"></div>
+        </div>
+    </div>
+
+    <script>
+        // Global state
+        let mockProjects = [];
+        let currentProjects = [];
+        let testStartTime = 0;
+
+        // Configuration - Update these to match your backend
+        const API_BASE_URL = 'http://localhost:5000';
+        const TEST_ENDPOINTS = {
+            health: `${API_BASE_URL}/health`,
+            auth: `${API_BASE_URL}/api/auth/me`,
+            projects: `${API_BASE_URL}/api/projects`
+        };
+
+        // Utility functions
+        function log(message, type = 'info', containerId = 'api-logs') {
+            const logsContainer = document.getElementById(containerId);
+            const logEntry = document.createElement('div');
+            logEntry.className = `log-entry ${type}`;
+            const timestamp = new Date().toLocaleTimeString();
+            logEntry.textContent = `[${timestamp}] ${message}`;
+            logsContainer.appendChild(logEntry);
+            logsContainer.scrollTop = logsContainer.scrollHeight;
+        }
+
+        function updateStatus(elementId, message, type = '') {
+            const element = document.getElementById(elementId);
+            element.textContent = message;
+            element.className = `status ${type}`;
+        }
+
+        function generateMockProject(id) {
+            const titles = [
+                'The Last Kingdom', 'Digital Dreams', 'Midnight Chronicles', 'Ocean\'s Echo',
+                'Forest Whispers', 'City of Glass', 'The Time Keeper', 'Stellar Journey',
+                'Hidden Valley', 'The Crystal Prophecy', 'Shadow Realm', 'Quantum Quest'
+            ];
+            const descriptions = [
+                'A tale of adventure and discovery',
+                'Exploring the digital frontier',
+                'Chronicles of the midnight hour',
+                'Stories from the deep ocean',
+                'Secrets hidden in ancient forests'
+            ];
+            const phases = ['idea', 'expand', 'story'];
+            
+            return {
+                id: `project-${id}`,
+                title: titles[Math.floor(Math.random() * titles.length)],
+                description: descriptions[Math.floor(Math.random() * descriptions.length)],
+                phase: phases[Math.floor(Math.random() * phases.length)],
+                created_at: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString(),
+                updated_at: new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000).toISOString(),
+                scene_count: Math.floor(Math.random() * 25),
+                word_count: Math.floor(Math.random() * 50000)
+            };
+        }
+
+        // API Connection Tests
+        async function testAPIConnection() {
+            updateStatus('api-status', 'Testing API connection...', 'loading');
+            log('Starting API connection test');
+
+            try {
+                const response = await fetch(TEST_ENDPOINTS.health, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    updateStatus('api-status', `✅ API Connected - Status: ${data.status || 'OK'}`, 'success');
+                    log(`API health check passed: ${JSON.stringify(data)}`, 'success');
+                } else {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+            } catch (error) {
+                updateStatus('api-status', `❌ API Connection Failed: ${error.message}`, 'error');
+                log(`API health check failed: ${error.message}`, 'error');
+            }
+        }
+
+        async function testAuthEndpoint() {
+            updateStatus('api-status', 'Testing auth endpoint...', 'loading');
+            log('Testing authentication endpoint');
+
+            try {
+                const response = await fetch(TEST_ENDPOINTS.auth, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    credentials: 'include'
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    updateStatus('api-status', '✅ Auth endpoint accessible', 'success');
+                    log(`Auth test passed: ${JSON.stringify(data)}`, 'success');
+                } else if (response.status === 401) {
+                    updateStatus('api-status', '⚠️ Auth endpoint working (401 expected)', 'success');
+                    log('Auth endpoint returned 401 (expected for unauthenticated request)', 'info');
+                } else {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+            } catch (error) {
+                updateStatus('api-status', `❌ Auth endpoint failed: ${error.message}`, 'error');
+                log(`Auth test failed: ${error.message}`, 'error');
+            }
+        }
+
+        async function testProjectsEndpoint() {
+            updateStatus('api-status', 'Testing projects endpoint...', 'loading');
+            log('Testing projects endpoint');
+
+            try {
+                const response = await fetch(TEST_ENDPOINTS.projects, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    credentials: 'include'
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    updateStatus('api-status', `✅ Projects endpoint working - Found ${data.length || 0} projects`, 'success');
+                    log(`Projects test passed: ${data.length || 0} projects found`, 'success');
+                } else if (response.status === 401) {
+                    updateStatus('api-status', '⚠️ Projects endpoint requires auth (401)', 'error');
+                    log('Projects endpoint requires authentication', 'error');
+                } else {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+            } catch (error) {
+                updateStatus('api-status', `❌ Projects endpoint failed: ${error.message}`, 'error');
+                log(`Projects test failed: ${error.message}`, 'error');
+            }
+        }
+
+        // Loading State Tests
+        function simulateLoadingState() {
+            updateStatus('projects-loading-state', 'Loading projects...', 'loading');
+            const container = document.getElementById('projects-container');
+            container.innerHTML = `
+                <div style="text-align: center; padding: 3rem;">
+                    <div class="loading-spinner" style="width: 32px; height: 32px; border-width: 4px; margin: 0 auto 1rem;"></div>
+                    <p>Loading your projects...</p>
+                </div>
+            `;
+        }
+
+        function simulateSuccessState() {
+            updateStatus('projects-loading-state', 'Projects loaded successfully!', 'success');
+            const container = document.getElementById('projects-container');
+            container.innerHTML = `
+                <div style="text-align: center; padding: 2rem; color: #38a169;">
+                    <p>✅ Projects loaded successfully!</p>
+                    <p style="font-size: 0.875rem; color: #718096; margin-top: 0.5rem;">Ready to display project data</p>
+                </div>
+            `;
+        }
+
+        function simulateErrorState() {
+            updateStatus('projects-loading-state', 'Failed to load projects', 'error');
+            const container = document.getElementById('projects-container');
+            container.innerHTML = `
+                <div style="text-align: center; padding: 2rem; color: #e53e3e;">
+                    <p>❌ Failed to load projects</p>
+                    <p style="font-size: 0.875rem; color: #718096; margin-top: 0.5rem;">
+                        Please check your connection and try again
+                    </p>
+                    <button onclick="simulateLoadingState()" style="margin-top: 1rem;">Retry</button>
+                </div>
+            `;
+        }
+
+        function resetLoadingTest() {
+            updateStatus('projects-loading-state', 'Click a button to test loading states', '');
+            document.getElementById('projects-container').innerHTML = '';
+        }
+
+        // Projects Grid Tests
+        function loadMockProjects() {
+            testStartTime = performance.now();
+            updateStatus('projects-loading-state', 'Loading mock projects...', 'loading');
+            
+            setTimeout(() => {
+                mockProjects = Array.from({length: 12}, (_, i) => generateMockProject(i));
+                currentProjects = [...mockProjects];
+                renderProjects();
+                const loadTime = Math.round(performance.now() - testStartTime);
+                document.getElementById('load-time').textContent = `${loadTime}ms`;
+                updateStatus('projects-loading-state', 'Mock projects loaded!', 'success');
+            }, 500); // Simulate network delay
+        }
+
+        function loadEmptyProjects() {
+            mockProjects = [];
+            currentProjects = [];
+            renderProjects();
+            updateStatus('projects-loading-state', 'Empty state loaded', 'success');
+        }
+
+        function loadLargeDataset() {
+            testStartTime = performance.now();
+            updateStatus('projects-loading-state', 'Loading large dataset...', 'loading');
+            
+            setTimeout(() => {
+                mockProjects = Array.from({length: 100}, (_, i) => generateMockProject(i));
+                currentProjects = [...mockProjects];
+                renderProjects();
+                const loadTime = Math.round(performance.now() - testStartTime);
+                document.getElementById('load-time').textContent = `${loadTime}ms`;
+                updateStatus('projects-loading-state', 'Large dataset loaded!', 'success');
+            }, 1000);
+        }
+
+        function clearProjects() {
+            mockProjects = [];
+            currentProjects = [];
+            renderProjects();
+            updateStatus('projects-loading-state', 'Projects cleared', '');
+        }
+
+        function renderProjects() {
+            const container = document.getElementById('projects-grid');
+            const totalProjects = mockProjects.length;
+            const filteredCount = currentProjects.length;
+
+            document.getElementById('total-projects').textContent = totalProjects;
+            document.getElementById('filtered-projects').textContent = filteredCount;
+
+            if (currentProjects.length === 0) {
+                if (totalProjects === 0) {
+                    container.innerHTML = `
+                        <div style="grid-column: 1/-1; text-align: center; padding: 3rem; color: #718096;">
+                            <p style="font-size: 1.125rem; margin-bottom: 0.5rem;">No projects yet</p>
+                            <p style="font-size: 0.875rem;">Create your first project to get started!</p>
+                        </div>
+                    `;
+                } else {
+                    container.innerHTML = `
+                        <div style="grid-column: 1/-1; text-align: center; padding: 2rem; color: #718096;">
+                            <p>No projects match your current filters</p>
+                        </div>
+                    `;
+                }
+                return;
+            }
+
+            container.innerHTML = currentProjects.map(project => `
+                <div class="project-card">
+                    <div class="project-title">${project.title}</div>
+                    <div class="project-description">${project.description}</div>
+                    <div class="project-meta">
+                        <span>Phase: ${project.phase}</span>
+                        <span>${project.scene_count} scenes</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function applyFilters() {
+            const filter = document.getElementById('project-filter').value;
+            const sort = document.getElementById('project-sort').value;
+            const search = document.getElementById('project-search').value.toLowerCase();
+
+            let filtered = [...mockProjects];
+
+            // Apply filter
+            if (filter !== 'all') {
+                filtered = filtered.filter(project => project.phase === filter);
+            }
+
+            // Apply search
+            if (search) {
+                filtered = filtered.filter(project => 
+                    project.title.toLowerCase().includes(search) ||
+                    project.description.toLowerCase().includes(search)
+                );
+            }
+
+            // Apply sort
+            filtered.sort((a, b) => {
+                switch (sort) {
+                    case 'newest':
+                        return new Date(b.created_at) - new Date(a.created_at);
+                    case 'oldest':
+                        return new Date(a.created_at) - new Date(b.created_at);
+                    case 'updated':
+                        return new Date(b.updated_at) - new Date(a.updated_at);
+                    case 'alphabetical':
+                        return a.title.localeCompare(b.title);
+                    default:
+                        return 0;
+                }
+            });
+
+            currentProjects = filtered;
+            renderProjects();
+        }
+
+        // Error Handling Tests
+        function triggerComponentError() {
+            updateStatus('error-boundary', '❌ Component Error: Failed to render ProjectCard', 'error');
+            log('Simulated component rendering error', 'error', 'api-logs');
+        }
+
+        function triggerNetworkError() {
+            updateStatus('error-boundary', '❌ Network Error: Connection timeout', 'error');
+            log('Simulated network connection error', 'error', 'api-logs');
+        }
+
+        function triggerAuthError() {
+            updateStatus('error-boundary', '❌ Auth Error: Invalid token', 'error');
+            log('Simulated authentication error', 'error', 'api-logs');
+        }
+
+        function clearErrors() {
+            updateStatus('error-boundary', '✅ No errors - System healthy', 'success');
+            log('All errors cleared', 'success', 'api-logs');
+        }
+
+        // Performance Tests
+        function performanceTest() {
+            updateStatus('performance-results', 'Running performance test...', 'loading');
+            log('Starting performance test', 'info', 'performance-logs');
+
+            const iterations = 1000;
+            const startTime = performance.now();
+
+            // Simulate component operations
+            for (let i = 0; i < iterations; i++) {
+                const mockProject = generateMockProject(i);
+                // Simulate DOM operations
+                const div = document.createElement('div');
+                div.innerHTML = `<div>${mockProject.title}</div>`;
+            }
+
+            const endTime = performance.now();
+            const totalTime = Math.round(endTime - startTime);
+            const avgTime = (totalTime / iterations).toFixed(2);
+
+            updateStatus('performance-results', `✅ Performance test completed in ${totalTime}ms`, 'success');
+            log(`Created ${iterations} mock projects in ${totalTime}ms (avg: ${avgTime}ms per item)`, 'success', 'performance-logs');
+        }
+
+        function memoryLeakTest() {
+            updateStatus('performance-results', 'Running memory leak test...', 'loading');
+            log('Starting memory leak test', 'info', 'performance-logs');
+
+            const initialMemory = performance.memory ? performance.memory.usedJSHeapSize : 'N/A';
+            
+            // Create and destroy many objects
+            for (let i = 0; i < 10000; i++) {
+                const projects = Array.from({length: 100}, (_, j) => generateMockProject(j));
+                // Force garbage collection opportunity
+                if (i % 1000 === 0) {
+                    setTimeout(() => {}, 0);
+                }
+            }
+
+            setTimeout(() => {
+                const finalMemory = performance.memory ? performance.memory.usedJSHeapSize : 'N/A';
+                updateStatus('performance-results', '✅ Memory leak test completed', 'success');
+                log(`Memory usage: ${initialMemory} → ${finalMemory} bytes`, 'info', 'performance-logs');
+            }, 100);
+        }
+
+        function stressTest() {
+            updateStatus('performance-results', 'Running stress test...', 'loading');
+            log('Starting stress test with 1000 items', 'info', 'performance-logs');
+
+            const startTime = performance.now();
+            
+            mockProjects = Array.from({length: 1000}, (_, i) => generateMockProject(i));
+            currentProjects = [...mockProjects];
+            
+            setTimeout(() => {
+                renderProjects();
+                const endTime = performance.now();
+                const totalTime = Math.round(endTime - startTime);
+                
+                updateStatus('performance-results', `✅ Stress test completed - 1000 items in ${totalTime}ms`, 'success');
+                log(`Rendered 1000 project cards in ${totalTime}ms`, 'success', 'performance-logs');
+            }, 10);
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            log('Test suite initialized', 'success');
+            updateStatus('api-status', 'Ready to test API connection', '');
+        });
+    </script>
+</body>
+</html>
