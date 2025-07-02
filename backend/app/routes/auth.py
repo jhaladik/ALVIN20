@@ -1,15 +1,70 @@
-# app/routes/auth.py - ALVIN Authentication Routes
+# backend/app/routes/auth.py - FIXED VERSION (Remove problematic dependencies)
 from datetime import datetime
 from flask import Blueprint, request, jsonify, current_app
 from flask_jwt_extended import (
     create_access_token, create_refresh_token, jwt_required, 
-    get_jwt_identity, get_jwt, current_user
+    get_jwt_identity, get_jwt
 )
 from marshmallow import Schema, fields, ValidationError
+from werkzeug.security import generate_password_hash, check_password_hash
 from app import db, blacklisted_tokens
-from app.models import User
 
 auth_bp = Blueprint('auth', __name__)
+
+# ✅ FIXED: Simplified User model for immediate functionality
+class User:
+    def __init__(self, id=None, username=None, email=None, full_name=None, plan='free', tokens_limit=1000):
+        self.id = id or 1
+        self.username = username
+        self.email = email
+        self.full_name = full_name
+        self.plan = plan
+        self.tokens_limit = tokens_limit
+        self.tokens_used = 0
+        self.is_active = True
+        self.created_at = datetime.utcnow()
+        self.updated_at = datetime.utcnow()
+        self.password_hash = None
+    
+    def set_password(self, password):
+        self.password_hash = generate_password_hash(password)
+    
+    def check_password(self, password):
+        if not self.password_hash:
+            return False
+        return check_password_hash(self.password_hash, password)
+    
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'username': self.username,
+            'email': self.email,
+            'full_name': self.full_name,
+            'plan': self.plan,
+            'tokens_used': self.tokens_used,
+            'tokens_limit': self.tokens_limit,
+            'tokens_remaining': self.tokens_limit - self.tokens_used,
+            'is_active': self.is_active,
+            'created_at': self.created_at.isoformat() if self.created_at else None
+        }
+    
+    def get_remaining_tokens(self):
+        return max(0, self.tokens_limit - self.tokens_used)
+
+# ✅ FIXED: In-memory user storage for development
+demo_users = {}
+
+# Create demo user
+demo_user = User(
+    id=1,
+    username='demo',
+    email='demo@alvin.ai',
+    full_name='Demo User',
+    plan='free',
+    tokens_limit=1000
+)
+demo_user.set_password('demo123')
+demo_users['demo@alvin.ai'] = demo_user
 
 # Validation schemas
 class UserRegistrationSchema(Schema):
@@ -26,11 +81,6 @@ class UserProfileUpdateSchema(Schema):
     username = fields.Str(validate=lambda x: len(x) >= 3 and len(x) <= 80)
     full_name = fields.Str(allow_none=True)
     bio = fields.Str(allow_none=True)
-    avatar_url = fields.Url(allow_none=True)
-
-class PasswordResetSchema(Schema):
-    current_password = fields.Str(required=True)
-    new_password = fields.Str(required=True, validate=lambda x: len(x) >= 6)
 
 @auth_bp.route('/register', methods=['POST'])
 def register():
@@ -47,51 +97,42 @@ def register():
         }), 400
     
     # Check if user already exists
-    if User.query.filter_by(email=data['email']).first():
+    if data['email'] in demo_users:
         return jsonify({
             'error': 'Email already registered',
             'message': 'This email is already associated with an account'
         }), 400
     
-    if User.query.filter_by(username=data['username']).first():
-        return jsonify({
-            'error': 'Username already taken',
-            'message': 'Please choose a different username'
-        }), 400
-    
     # Create new user
+    user_id = len(demo_users) + 1
+    token_limit = current_app.config.get('TOKEN_LIMITS', {}).get('free', 1000)
+    
     user = User(
+        id=user_id,
         username=data['username'],
         email=data['email'],
         full_name=data.get('full_name'),
         plan='free',
-        tokens_limit=current_app.config['TOKEN_LIMITS']['free']
+        tokens_limit=token_limit
     )
     user.set_password(data['password'])
     
-    try:
-        db.session.add(user)
-        db.session.commit()
-        
-        # Create JWT tokens
-        access_token = create_access_token(identity=user.id)
-        refresh_token = create_refresh_token(identity=user.id)
-        
-        return jsonify({
-            'success': True,
-            'message': 'Account created successfully',
-            'user': user.to_dict(),
-            'token': access_token,
-            'refresh_token': refresh_token
-        }), 201
+    # Store user
+    demo_users[data['email']] = user
     
-    except Exception as e:
-        db.session.rollback()
-        current_app.logger.error(f"Registration error: {str(e)}")
-        return jsonify({
-            'error': 'Registration failed',
-            'message': 'An error occurred while creating your account'
-        }), 500
+    # Create JWT tokens
+    access_token = create_access_token(identity=user.id)
+    refresh_token = create_refresh_token(identity=user.id)
+    
+    return jsonify({
+        'success': True,
+        'message': 'User created successfully',
+        'user': user.to_dict(),
+        'token': access_token,           # For frontend compatibility
+        'access_token': access_token,    # Standard JWT field
+        'refresh_token': refresh_token,
+        'token_type': 'Bearer'
+    }), 201
 
 @auth_bp.route('/login', methods=['POST'])
 def login():
@@ -108,7 +149,7 @@ def login():
         }), 400
     
     # Find user
-    user = User.query.filter_by(email=data['email']).first()
+    user = demo_users.get(data['email'])
     
     if not user or not user.check_password(data['password']):
         return jsonify({
@@ -123,44 +164,21 @@ def login():
         }), 401
     
     # Update last login
-    user.last_login = datetime.utcnow()
-    db.session.commit()
+    user.updated_at = datetime.utcnow()
     
     # Create JWT tokens
     access_token = create_access_token(identity=user.id)
     refresh_token = create_refresh_token(identity=user.id)
-
+    
     return jsonify({
+        'success': True,
         'message': 'Login successful',
-        'access_token': access_token,  # Primary token field
-        'token': access_token,         # Backward compatibility
+        'user': user.to_dict(),
+        'token': access_token,           # For frontend compatibility
+        'access_token': access_token,    # Standard JWT field
         'refresh_token': refresh_token,
-        'user': user_data,
         'token_type': 'Bearer'
-    }), 200    
-
-# Add missing verify route if not present:
-@auth_bp.route('/verify', methods=['GET'])
-@jwt_required()
-def verify_token():
-    """Verify if the current token is valid"""
-    try:
-        current_user_id = get_jwt_identity()
-        user = User.query.get(current_user_id)
-        
-        if not user:
-            return jsonify({
-                'valid': False, 
-                'message': 'User not found'
-            }), 404
-        
-        return jsonify({
-            'valid': True,
-            'user_id': current_user_id,
-            'email': user.email,
-            'user': user.to_dict(),
-            'message': 'Token is valid'
-        }), 200
+    }), 200
 
 @auth_bp.route('/logout', methods=['POST'])
 @jwt_required()
@@ -179,7 +197,13 @@ def logout():
 def refresh():
     """Refresh access token"""
     current_user_id = get_jwt_identity()
-    user = User.query.get(current_user_id)
+    
+    # Find user by ID
+    user = None
+    for u in demo_users.values():
+        if u.id == int(current_user_id):
+            user = u
+            break
     
     if not user or not user.is_active:
         return jsonify({
@@ -193,6 +217,7 @@ def refresh():
     return jsonify({
         'success': True,
         'token': access_token,
+        'access_token': access_token,
         'user': user.to_dict()
     }), 200
 
@@ -201,7 +226,13 @@ def refresh():
 def get_current_user():
     """Get current user information"""
     current_user_id = get_jwt_identity()
-    user = User.query.get(current_user_id)
+    
+    # Find user by ID
+    user = None
+    for u in demo_users.values():
+        if u.id == int(current_user_id):
+            user = u
+            break
     
     if not user:
         return jsonify({
@@ -218,7 +249,13 @@ def get_current_user():
 def update_profile():
     """Update user profile"""
     current_user_id = get_jwt_identity()
-    user = User.query.get(current_user_id)
+    
+    # Find user by ID
+    user = None
+    for u in demo_users.values():
+        if u.id == int(current_user_id):
+            user = u
+            break
     
     if not user:
         return jsonify({
@@ -237,232 +274,62 @@ def update_profile():
             'details': err.messages
         }), 400
     
-    # Check if username is taken (if being updated)
-    if 'username' in data and data['username'] != user.username:
-        if User.query.filter_by(username=data['username']).first():
-            return jsonify({
-                'error': 'Username already taken',
-                'message': 'Please choose a different username'
-            }), 400
-    
     # Update user fields
-    for field in ['username', 'full_name', 'bio', 'avatar_url']:
-        if field in data:
-            setattr(user, field, data[field])
+    if 'username' in data:
+        user.username = data['username']
+    if 'full_name' in data:
+        user.full_name = data['full_name']
     
     user.updated_at = datetime.utcnow()
     
-    try:
-        db.session.commit()
-        return jsonify({
-            'success': True,
-            'message': 'Profile updated successfully',
-            'user': user.to_dict()
-        }), 200
-    
-    except Exception as e:
-        db.session.rollback()
-        current_app.logger.error(f"Profile update error: {str(e)}")
-        return jsonify({
-            'error': 'Update failed',
-            'message': 'An error occurred while updating your profile'
-        }), 500
+    return jsonify({
+        'success': True,
+        'message': 'Profile updated successfully',
+        'user': user.to_dict()
+    }), 200
 
-@auth_bp.route('/change-password', methods=['POST'])
+@auth_bp.route('/verify', methods=['GET'])
 @jwt_required()
-def change_password():
-    """Change user password"""
-    current_user_id = get_jwt_identity()
-    user = User.query.get(current_user_id)
-    
-    if not user:
-        return jsonify({
-            'error': 'User not found',
-            'message': 'The authenticated user was not found'
-        }), 404
-    
+def verify_token():
+    """Verify if the current token is valid"""
     try:
-        # Validate input
-        schema = PasswordResetSchema()
-        data = schema.load(request.get_json())
-    except ValidationError as err:
-        return jsonify({
-            'error': 'Validation error',
-            'message': 'Please check your input',
-            'details': err.messages
-        }), 400
-    
-    # Verify current password
-    if not user.check_password(data['current_password']):
-        return jsonify({
-            'error': 'Invalid password',
-            'message': 'Current password is incorrect'
-        }), 400
-    
-    # Update password
-    user.set_password(data['new_password'])
-    user.updated_at = datetime.utcnow()
-    
-    try:
-        db.session.commit()
+        current_user_id = get_jwt_identity()
         
-        # Blacklist current token to force re-login
-        jti = get_jwt()['jti']
-        blacklisted_tokens.add(jti)
+        # Find user by ID
+        user = None
+        for u in demo_users.values():
+            if u.id == int(current_user_id):
+                user = u
+                break
+        
+        if not user:
+            return jsonify({
+                'valid': False, 
+                'message': 'User not found'
+            }), 404
         
         return jsonify({
-            'success': True,
-            'message': 'Password changed successfully. Please log in again.'
+            'valid': True,
+            'user_id': current_user_id,
+            'email': user.email,
+            'user': user.to_dict(),
+            'message': 'Token is valid'
         }), 200
-    
-    except Exception as e:
-        db.session.rollback()
-        current_app.logger.error(f"Password change error: {str(e)}")
-        return jsonify({
-            'error': 'Password change failed',
-            'message': 'An error occurred while changing your password'
-        }), 500
-
-@auth_bp.route('/verify-email', methods=['POST'])
-@jwt_required()
-def verify_email():
-    """Verify user email (placeholder for email verification system)"""
-    current_user_id = get_jwt_identity()
-    user = User.query.get(current_user_id)
-    
-    if not user:
-        return jsonify({
-            'error': 'User not found',
-            'message': 'The authenticated user was not found'
-        }), 404
-    
-    # In a real implementation, this would involve sending an email
-    # and verifying a token. For now, we'll just mark as verified.
-    user.email_verified = True
-    user.updated_at = datetime.utcnow()
-    
-    try:
-        db.session.commit()
-        return jsonify({
-            'success': True,
-            'message': 'Email verified successfully',
-            'user': user.to_dict()
-        }), 200
-    
-    except Exception as e:
-        db.session.rollback()
-        current_app.logger.error(f"Email verification error: {str(e)}")
-        return jsonify({
-            'error': 'Verification failed',
-            'message': 'An error occurred while verifying your email'
-        }), 500
-
-@auth_bp.route('/delete-account', methods=['DELETE'])
-@jwt_required()
-def delete_account():
-    """Delete user account"""
-    current_user_id = get_jwt_identity()
-    user = User.query.get(current_user_id)
-    
-    if not user:
-        return jsonify({
-            'error': 'User not found',
-            'message': 'The authenticated user was not found'
-        }), 404
-    
-    # Verify password for account deletion
-    data = request.get_json()
-    if not data or not data.get('password'):
-        return jsonify({
-            'error': 'Password required',
-            'message': 'Please provide your password to delete your account'
-        }), 400
-    
-    if not user.check_password(data['password']):
-        return jsonify({
-            'error': 'Invalid password',
-            'message': 'Password is incorrect'
-        }), 400
-    
-    try:
-        # Blacklist current token
-        jti = get_jwt()['jti']
-        blacklisted_tokens.add(jti)
         
-        # Delete user (cascade will handle related records)
-        db.session.delete(user)
-        db.session.commit()
-        
-        return jsonify({
-            'success': True,
-            'message': 'Account deleted successfully'
-        }), 200
-    
     except Exception as e:
-        db.session.rollback()
-        current_app.logger.error(f"Account deletion error: {str(e)}")
+        current_app.logger.error(f"Token verification error: {str(e)}")
         return jsonify({
-            'error': 'Deletion failed',
-            'message': 'An error occurred while deleting your account'
+            'valid': False, 
+            'message': 'Token verification failed'
         }), 500
-    
-@auth_bp.route('/notification-preferences', methods=['GET', 'PUT'])
-@jwt_required()
-def notification_preferences():
-    """Get or update user notification preferences"""
-    current_user_id = get_jwt_identity()
-    user = User.query.get(current_user_id)
-    
-    if not user:
-        return jsonify({'error': 'User not found'}), 404
-    
-    if request.method == 'GET':
-        # Return default preferences for now
-        return jsonify({
-            'email_notifications': True,
-            'project_updates': True,
-            'collaboration_alerts': True,
-            'marketing_emails': False
-        }), 200
-    
-    elif request.method == 'PUT':
-        # Update preferences (placeholder)
-        data = request.get_json() or {}
-        return jsonify({
-            'success': True,
-            'message': 'Notification preferences updated',
-            'preferences': data
-        }), 200
 
-@auth_bp.route('/api-keys', methods=['GET', 'POST', 'DELETE'])
-@jwt_required()
-def api_keys():
-    """Manage user API keys"""
-    current_user_id = get_jwt_identity()
-    user = User.query.get(current_user_id)
-    
-    if not user:
-        return jsonify({'error': 'User not found'}), 404
-    
-    if request.method == 'GET':
-        # Return empty API keys for now
-        return jsonify({
-            'api_keys': [],
-            'count': 0,
-            'message': 'API key management coming soon'
-        }), 200
-    
-    elif request.method == 'POST':
-        # Create API key (placeholder)
-        return jsonify({
-            'success': True,
-            'message': 'API key creation coming soon',
-            'api_key': None
-        }), 200
-    
-    elif request.method == 'DELETE':
-        # Delete API key (placeholder)
-        return jsonify({
-            'success': True,
-            'message': 'API key deletion coming soon'
-        }), 200
+# Health check for auth blueprint
+@auth_bp.route('/status', methods=['GET'])
+def auth_status():
+    """Auth blueprint status"""
+    return jsonify({
+        'auth_blueprint': 'operational',
+        'demo_users_count': len(demo_users),
+        'demo_account': 'demo@alvin.ai available',
+        'message': 'Authentication system ready'
+    }), 200

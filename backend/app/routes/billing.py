@@ -1,31 +1,115 @@
-# app/routes/billing.py - ALVIN Billing Routes
+# backend/app/routes/billing.py - SIMPLIFIED BILLING ROUTES
 from datetime import datetime, timedelta
 from flask import Blueprint, request, jsonify, current_app
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from marshmallow import Schema, fields, ValidationError
-from sqlalchemy import desc, func
-from app import db
-from app.models import User, BillingPlan, UserSubscription, TokenUsageLog
-
 
 billing_bp = Blueprint('billing', __name__)
 
-# Validation schemas
-class SubscribeSchema(Schema):
-    plan_id = fields.Int(required=True)
-    payment_method_id = fields.Str(missing=None)  # For payment integration
+# Mock billing data
+BILLING_PLANS = [
+    {
+        'id': 1,
+        'name': 'free',
+        'display_name': 'Free Plan',
+        'price': 0,
+        'currency': 'USD',
+        'interval': 'month',
+        'tokens_limit': 1000,
+        'features': [
+            'Basic writing tools',
+            '1,000 AI tokens per month',
+            'Up to 3 projects',
+            'Community support'
+        ],
+        'is_popular': False,
+        'is_active': True
+    },
+    {
+        'id': 2,
+        'name': 'pro',
+        'display_name': 'Pro Plan',
+        'price': 9.99,
+        'currency': 'USD',
+        'interval': 'month',
+        'tokens_limit': 10000,
+        'features': [
+            'Advanced AI tools',
+            '10,000 AI tokens per month',
+            'Unlimited projects',
+            'Advanced analytics',
+            'Priority support',
+            'Export features'
+        ],
+        'is_popular': True,
+        'is_active': True
+    },
+    {
+        'id': 3,
+        'name': 'premium',
+        'display_name': 'Premium Plan',
+        'price': 19.99,
+        'currency': 'USD',
+        'interval': 'month',
+        'tokens_limit': 50000,
+        'features': [
+            'All Pro features',
+            '50,000 AI tokens per month',
+            'Real-time collaboration',
+            'Custom AI models',
+            'API access',
+            'White-label options',
+            'Dedicated support'
+        ],
+        'is_popular': False,
+        'is_active': True
+    }
+]
 
-class BuyTokensSchema(Schema):
-    amount = fields.Int(required=True, validate=lambda x: x > 0 and x <= 100000)
-    payment_method_id = fields.Str(missing=None)  # For payment integration
+TOKEN_PACKAGES = [
+    {
+        'id': 1,
+        'name': 'starter',
+        'amount': 1000,
+        'price': 2.99,
+        'currency': 'USD',
+        'description': '1,000 additional AI tokens'
+    },
+    {
+        'id': 2,
+        'name': 'boost',
+        'amount': 5000,
+        'price': 12.99,
+        'currency': 'USD',
+        'description': '5,000 additional AI tokens',
+        'savings': '13% off'
+    },
+    {
+        'id': 3,
+        'name': 'power',
+        'amount': 10000,
+        'price': 24.99,
+        'currency': 'USD',
+        'description': '10,000 additional AI tokens',
+        'savings': '17% off'
+    }
+]
 
 @billing_bp.route('/plans', methods=['GET'])
 def get_billing_plans():
     """Get all available billing plans"""
-    plans = BillingPlan.query.filter_by(is_active=True, is_public=True).all()
-    
     return jsonify({
-        'plans': [plan.to_dict() for plan in plans]
+        'plans': BILLING_PLANS,
+        'total_plans': len(BILLING_PLANS),
+        'currency': 'USD'
+    }), 200
+
+@billing_bp.route('/token-packages', methods=['GET'])
+def get_token_packages():
+    """Get available token packages"""
+    return jsonify({
+        'packages': TOKEN_PACKAGES,
+        'total_packages': len(TOKEN_PACKAGES),
+        'currency': 'USD'
     }), 200
 
 @billing_bp.route('/subscription', methods=['GET'])
@@ -33,142 +117,79 @@ def get_billing_plans():
 def get_current_subscription():
     """Get current user's subscription details"""
     current_user_id = get_jwt_identity()
-    user = User.query.get(current_user_id)
     
-    if not user:
-        return jsonify({
-            'error': 'User not found',
-            'message': 'The authenticated user was not found'
-        }), 404
-    
-    # Get current subscription
-    subscription = UserSubscription.query.filter_by(
-        user_id=current_user_id,
-        status='active'
-    ).first()
-    
-    # Get current plan details
-    current_plan = BillingPlan.query.filter_by(name=user.plan).first()
-    
+    # Mock subscription data
     subscription_data = {
-        'user_plan': user.plan,
-        'tokens_used': user.tokens_used,
-        'tokens_limit': user.tokens_limit,
-        'tokens_remaining': user.get_remaining_tokens(),
-        'plan_details': current_plan.to_dict() if current_plan else None,
-        'subscription': subscription.to_dict() if subscription else None
-    }
-    
-    # Add usage statistics
-    if subscription:
-        # Get usage for current period
-        period_start = subscription.current_period_start
-        period_end = subscription.current_period_end
-        
-        period_usage = TokenUsageLog.query.filter(
-            TokenUsageLog.user_id == current_user_id,
-            TokenUsageLog.created_at >= period_start,
-            TokenUsageLog.created_at <= period_end,
-            TokenUsageLog.billable == True
-        ).with_entities(func.sum(TokenUsageLog.total_cost)).scalar() or 0
-        
-        subscription_data['period_usage'] = {
-            'tokens_used_this_period': period_usage,
-            'period_start': period_start.isoformat(),
-            'period_end': period_end.isoformat(),
-            'days_remaining': (period_end - datetime.utcnow()).days
+        'user_id': current_user_id,
+        'current_plan': 'free',
+        'plan_details': BILLING_PLANS[0],  # Free plan
+        'tokens_used': 150,
+        'tokens_limit': 1000,
+        'tokens_remaining': 850,
+        'billing_cycle': 'monthly',
+        'next_billing_date': (datetime.utcnow() + timedelta(days=30)).isoformat(),
+        'subscription_status': 'active',
+        'auto_renewal': True,
+        'usage_this_month': {
+            'ai_operations': 25,
+            'projects_created': 2,
+            'scenes_generated': 8,
+            'tokens_consumed': 150
         }
+    }
     
     return jsonify(subscription_data), 200
 
 @billing_bp.route('/subscribe', methods=['POST'])
 @jwt_required()
 def subscribe_to_plan():
-    """Subscribe user to a billing plan"""
+    """Subscribe to a billing plan"""
     current_user_id = get_jwt_identity()
-    user = User.query.get(current_user_id)
-    
-    if not user:
-        return jsonify({
-            'error': 'User not found',
-            'message': 'The authenticated user was not found'
-        }), 404
     
     try:
-        # Validate input
-        schema = SubscribeSchema()
-        data = schema.load(request.get_json())
-    except ValidationError as err:
-        return jsonify({
-            'error': 'Validation error',
-            'message': 'Please check your input',
-            'details': err.messages
-        }), 400
-    
-    # Get the plan
-    plan = BillingPlan.query.filter_by(
-        id=data['plan_id'],
-        is_active=True,
-        is_public=True
-    ).first()
-    
-    if not plan:
-        return jsonify({
-            'error': 'Plan not found',
-            'message': 'The specified billing plan was not found'
-        }), 404
-    
-    # Check if user already has an active subscription
-    existing_subscription = UserSubscription.query.filter_by(
-        user_id=current_user_id,
-        status='active'
-    ).first()
-    
-    if existing_subscription:
-        return jsonify({
-            'error': 'Already subscribed',
-            'message': 'You already have an active subscription. Please cancel it first to change plans.'
-        }), 400
-    
-    try:
-        # In a real implementation, this would integrate with Stripe or another payment processor
-        # For now, we'll simulate the subscription creation
+        data = request.get_json()
+        plan_id = data.get('plan_id')
+        payment_method = data.get('payment_method_id', 'demo_payment')
         
-        # Calculate period dates
-        period_start = datetime.utcnow()
-        period_end = period_start + timedelta(days=30)  # Monthly subscription
+        if not plan_id:
+            return jsonify({
+                'error': 'Plan ID required',
+                'message': 'Please specify a plan_id'
+            }), 400
         
-        # Create subscription
-        subscription = UserSubscription(
-            user_id=current_user_id,
-            plan_id=plan.id,
-            status='active',
-            current_period_start=period_start,
-            current_period_end=period_end,
-            # In real implementation, add Stripe IDs:
-            # stripe_subscription_id=stripe_subscription.id,
-            # stripe_customer_id=stripe_customer.id
-        )
+        # Find the plan
+        plan = next((p for p in BILLING_PLANS if p['id'] == plan_id), None)
+        if not plan:
+            return jsonify({
+                'error': 'Plan not found',
+                'message': 'The specified plan does not exist'
+            }), 404
         
-        # Update user plan and token limit
-        user.plan = plan.name
-        user.tokens_limit = plan.monthly_token_limit
-        # Reset tokens for new subscription
-        user.tokens_used = 0
-        
-        db.session.add(subscription)
-        db.session.commit()
+        # Mock subscription creation
+        subscription = {
+            'id': f'sub_{current_user_id}_{plan_id}',
+            'user_id': current_user_id,
+            'plan_id': plan_id,
+            'plan_name': plan['name'],
+            'status': 'active',
+            'created_at': datetime.utcnow().isoformat(),
+            'current_period_start': datetime.utcnow().isoformat(),
+            'current_period_end': (datetime.utcnow() + timedelta(days=30)).isoformat(),
+            'tokens_limit': plan['tokens_limit'],
+            'amount': plan['price'],
+            'currency': plan['currency'],
+            'interval': plan['interval']
+        }
         
         return jsonify({
             'success': True,
-            'message': f'Successfully subscribed to {plan.display_name}',
-            'subscription': subscription.to_dict(),
-            'user': user.to_dict()
+            'message': f'Successfully subscribed to {plan["display_name"]}',
+            'subscription': subscription,
+            'plan': plan
         }), 201
-    
+        
     except Exception as e:
-        db.session.rollback()
-        current_app.logger.error(f"Subscription creation error: {str(e)}")
+        current_app.logger.error(f"Subscription error: {str(e)}")
         return jsonify({
             'error': 'Subscription failed',
             'message': 'An error occurred while processing your subscription'
@@ -177,122 +198,64 @@ def subscribe_to_plan():
 @billing_bp.route('/cancel', methods=['POST'])
 @jwt_required()
 def cancel_subscription():
-    """Cancel user's current subscription"""
+    """Cancel current subscription"""
     current_user_id = get_jwt_identity()
-    user = User.query.get(current_user_id)
     
-    if not user:
-        return jsonify({
-            'error': 'User not found',
-            'message': 'The authenticated user was not found'
-        }), 404
-    
-    # Get current subscription
-    subscription = UserSubscription.query.filter_by(
-        user_id=current_user_id,
-        status='active'
-    ).first()
-    
-    if not subscription:
-        return jsonify({
-            'error': 'No active subscription',
-            'message': 'You do not have an active subscription to cancel'
-        }), 400
-    
-    try:
-        # In a real implementation, cancel with Stripe
-        # stripe.Subscription.delete(subscription.stripe_subscription_id)
-        
-        # Mark subscription as cancelled
-        subscription.status = 'cancelled'
-        
-        # Downgrade user to free plan
-        free_plan = BillingPlan.query.filter_by(name='free').first()
-        if free_plan:
-            user.plan = 'free'
-            user.tokens_limit = free_plan.monthly_token_limit
-        
-        db.session.commit()
-        
-        return jsonify({
-            'success': True,
-            'message': 'Subscription cancelled successfully',
-            'user': user.to_dict()
-        }), 200
-    
-    except Exception as e:
-        db.session.rollback()
-        current_app.logger.error(f"Subscription cancellation error: {str(e)}")
-        return jsonify({
-            'error': 'Cancellation failed',
-            'message': 'An error occurred while cancelling your subscription'
-        }), 500
+    # Mock cancellation
+    return jsonify({
+        'success': True,
+        'message': 'Subscription cancelled successfully',
+        'cancellation_date': datetime.utcnow().isoformat(),
+        'effective_date': (datetime.utcnow() + timedelta(days=30)).isoformat(),
+        'refund_amount': 0,
+        'downgrade_plan': 'free'
+    }), 200
 
 @billing_bp.route('/buy-tokens', methods=['POST'])
 @jwt_required()
 def buy_tokens():
     """Purchase additional tokens"""
     current_user_id = get_jwt_identity()
-    user = User.query.get(current_user_id)
-    
-    if not user:
-        return jsonify({
-            'error': 'User not found',
-            'message': 'The authenticated user was not found'
-        }), 404
     
     try:
-        # Validate input
-        schema = BuyTokensSchema()
-        data = schema.load(request.get_json())
-    except ValidationError as err:
-        return jsonify({
-            'error': 'Validation error',
-            'message': 'Please check your input',
-            'details': err.messages
-        }), 400
-    
-    token_amount = data['amount']
-    
-    # Calculate price (example: $0.001 per token)
-    price_per_token_cents = 0.1  # $0.001 = 0.1 cents
-    total_price_cents = int(token_amount * price_per_token_cents)
-    
-    try:
-        # In a real implementation, process payment with Stripe
-        # payment_intent = stripe.PaymentIntent.create(
-        #     amount=total_price_cents,
-        #     currency='usd',
-        #     payment_method=data.get('payment_method_id'),
-        #     confirm=True
-        # )
+        data = request.get_json()
+        package_id = data.get('package_id')
+        amount = data.get('amount', 1000)
         
-        # For now, simulate successful payment
-        # Add tokens to user's limit
-        user.tokens_limit += token_amount
+        if package_id:
+            # Find the package
+            package = next((p for p in TOKEN_PACKAGES if p['id'] == package_id), None)
+            if not package:
+                return jsonify({
+                    'error': 'Package not found',
+                    'message': 'The specified token package does not exist'
+                }), 404
+            
+            amount = package['amount']
+            price = package['price']
+        else:
+            # Custom amount
+            price = amount * 0.003  # $0.003 per token
         
-        # Log the token purchase (you'd create a TokenPurchase model for this)
-        # token_purchase = TokenPurchase(
-        #     user_id=current_user_id,
-        #     tokens_purchased=token_amount,
-        #     price_paid_cents=total_price_cents,
-        #     payment_status='completed'
-        # )
-        # db.session.add(token_purchase)
-        
-        db.session.commit()
+        # Mock token purchase
+        purchase = {
+            'id': f'purchase_{current_user_id}_{int(datetime.now().timestamp())}',
+            'user_id': current_user_id,
+            'tokens_purchased': amount,
+            'price_paid': price,
+            'currency': 'USD',
+            'purchase_date': datetime.utcnow().isoformat(),
+            'tokens_added_to_account': True
+        }
         
         return jsonify({
             'success': True,
-            'message': f'Successfully purchased {token_amount} tokens',
-            'tokens_purchased': token_amount,
-            'price_paid_cents': total_price_cents,
-            'price_paid_dollars': total_price_cents / 100,
-            'user': user.to_dict()
-        }), 200
-    
+            'message': f'Successfully purchased {amount:,} tokens',
+            'purchase': purchase,
+            'new_token_balance': 1000 + amount  # Mock current balance + new tokens
+        }), 201
+        
     except Exception as e:
-        db.session.rollback()
         current_app.logger.error(f"Token purchase error: {str(e)}")
         return jsonify({
             'error': 'Purchase failed',
@@ -302,205 +265,107 @@ def buy_tokens():
 @billing_bp.route('/token-usage', methods=['GET'])
 @jwt_required()
 def get_token_usage():
-    """Get token usage analytics for the user"""
+    """Get token usage history"""
     current_user_id = get_jwt_identity()
+    period = request.args.get('period', 'month')  # week, month, year
     
-    # Query parameters
-    period = request.args.get('period', 'month')  # day, week, month, year
-    limit = min(request.args.get('limit', 30, type=int), 365)
-    
-    # Calculate date range
-    now = datetime.utcnow()
-    if period == 'day':
-        start_date = now - timedelta(days=limit)
-        date_format = '%Y-%m-%d'
-    elif period == 'week':
-        start_date = now - timedelta(weeks=limit)
-        date_format = '%Y-%W'
+    # Mock usage data
+    if period == 'week':
+        usage_data = [
+            {'date': '2025-06-26', 'tokens_used': 45, 'operations': 8},
+            {'date': '2025-06-27', 'tokens_used': 32, 'operations': 6},
+            {'date': '2025-06-28', 'tokens_used': 28, 'operations': 5},
+            {'date': '2025-06-29', 'tokens_used': 55, 'operations': 12},
+            {'date': '2025-06-30', 'tokens_used': 41, 'operations': 9},
+            {'date': '2025-07-01', 'tokens_used': 38, 'operations': 7},
+            {'date': '2025-07-02', 'tokens_used': 22, 'operations': 4}
+        ]
     elif period == 'month':
-        start_date = now - timedelta(days=limit * 30)
-        date_format = '%Y-%m'
+        usage_data = [
+            {'date': '2025-06-01', 'tokens_used': 856, 'operations': 124},
+            {'date': '2025-07-01', 'tokens_used': 261, 'operations': 51}
+        ]
     else:  # year
-        start_date = now - timedelta(days=limit * 365)
-        date_format = '%Y'
+        usage_data = [
+            {'date': '2025-01', 'tokens_used': 2340, 'operations': 345},
+            {'date': '2025-02', 'tokens_used': 1890, 'operations': 278},
+            {'date': '2025-03', 'tokens_used': 2156, 'operations': 312},
+            {'date': '2025-04', 'tokens_used': 1756, 'operations': 267},
+            {'date': '2025-05', 'tokens_used': 2045, 'operations': 298},
+            {'date': '2025-06', 'tokens_used': 856, 'operations': 124},
+            {'date': '2025-07', 'tokens_used': 261, 'operations': 51}
+        ]
     
-    # Get usage data
-    usage_query = db.session.query(
-        func.date_trunc(period, TokenUsageLog.created_at).label('period'),
-        func.sum(TokenUsageLog.total_cost).label('total_tokens'),
-        func.count(TokenUsageLog.id).label('operation_count'),
-        TokenUsageLog.operation_type
-    ).filter(
-        TokenUsageLog.user_id == current_user_id,
-        TokenUsageLog.created_at >= start_date,
-        TokenUsageLog.billable == True
-    ).group_by(
-        func.date_trunc(period, TokenUsageLog.created_at),
-        TokenUsageLog.operation_type
-    ).order_by(
-        func.date_trunc(period, TokenUsageLog.created_at).desc()
-    ).all()
-    
-    # Format data for charts
-    usage_by_period = {}
-    usage_by_operation = {}
-    
-    for row in usage_query:
-        period_key = row.period.strftime(date_format)
-        
-        # Aggregate by period
-        if period_key not in usage_by_period:
-            usage_by_period[period_key] = {
-                'period': period_key,
-                'total_tokens': 0,
-                'operation_count': 0
-            }
-        
-        usage_by_period[period_key]['total_tokens'] += row.total_tokens or 0
-        usage_by_period[period_key]['operation_count'] += row.operation_count or 0
-        
-        # Aggregate by operation type
-        if row.operation_type not in usage_by_operation:
-            usage_by_operation[row.operation_type] = {
-                'operation_type': row.operation_type,
-                'total_tokens': 0,
-                'operation_count': 0
-            }
-        
-        usage_by_operation[row.operation_type]['total_tokens'] += row.total_tokens or 0
-        usage_by_operation[row.operation_type]['operation_count'] += row.operation_count or 0
-    
-    # Get total usage statistics
-    total_stats = db.session.query(
-        func.sum(TokenUsageLog.total_cost).label('total_tokens'),
-        func.count(TokenUsageLog.id).label('total_operations'),
-        func.avg(TokenUsageLog.total_cost).label('avg_tokens_per_operation')
-    ).filter(
-        TokenUsageLog.user_id == current_user_id,
-        TokenUsageLog.billable == True
-    ).first()
-    
-    # Get most expensive operations
-    top_operations = db.session.query(
-        TokenUsageLog.operation_type,
-        func.sum(TokenUsageLog.total_cost).label('total_cost'),
-        func.count(TokenUsageLog.id).label('count')
-    ).filter(
-        TokenUsageLog.user_id == current_user_id,
-        TokenUsageLog.created_at >= start_date,
-        TokenUsageLog.billable == True
-    ).group_by(
-        TokenUsageLog.operation_type
-    ).order_by(
-        func.sum(TokenUsageLog.total_cost).desc()
-    ).limit(10).all()
+    total_tokens = sum(item['tokens_used'] for item in usage_data)
+    total_operations = sum(item['operations'] for item in usage_data)
     
     return jsonify({
+        'usage_data': usage_data,
         'period': period,
-        'date_range': {
-            'start': start_date.isoformat(),
-            'end': now.isoformat()
-        },
-        'usage_by_period': list(usage_by_period.values()),
-        'usage_by_operation': list(usage_by_operation.values()),
-        'total_stats': {
-            'total_tokens': total_stats.total_tokens or 0,
-            'total_operations': total_stats.total_operations or 0,
-            'avg_tokens_per_operation': float(total_stats.avg_tokens_per_operation or 0)
-        },
-        'top_operations': [{
-            'operation_type': op.operation_type,
-            'total_cost': op.total_cost,
-            'count': op.count,
-            'avg_cost': op.total_cost / op.count if op.count > 0 else 0
-        } for op in top_operations]
+        'summary': {
+            'total_tokens_used': total_tokens,
+            'total_operations': total_operations,
+            'average_tokens_per_operation': round(total_tokens / total_operations, 2) if total_operations > 0 else 0,
+            'current_balance': 850  # Mock remaining balance
+        }
     }), 200
-
-@billing_bp.route('/usage-export', methods=['GET'])
-@jwt_required()
-def export_usage_data():
-    """Export detailed token usage data"""
-    current_user_id = get_jwt_identity()
-    
-    # Query parameters
-    start_date = request.args.get('start_date')
-    end_date = request.args.get('end_date')
-    format_type = request.args.get('format', 'json')  # json, csv
-    
-    # Build query
-    query = TokenUsageLog.query.filter_by(
-        user_id=current_user_id,
-        billable=True
-    )
-    
-    if start_date:
-        try:
-            start_dt = datetime.fromisoformat(start_date)
-            query = query.filter(TokenUsageLog.created_at >= start_dt)
-        except ValueError:
-            return jsonify({
-                'error': 'Invalid start_date format',
-                'message': 'Please use ISO format: YYYY-MM-DD or YYYY-MM-DDTHH:MM:SS'
-            }), 400
-    
-    if end_date:
-        try:
-            end_dt = datetime.fromisoformat(end_date)
-            query = query.filter(TokenUsageLog.created_at <= end_dt)
-        except ValueError:
-            return jsonify({
-                'error': 'Invalid end_date format',
-                'message': 'Please use ISO format: YYYY-MM-DD or YYYY-MM-DDTHH:MM:SS'
-            }), 400
-    
-    # Get usage logs
-    usage_logs = query.order_by(TokenUsageLog.created_at.desc()).limit(10000).all()
-    
-    if format_type == 'csv':
-        # For CSV export, you'd implement CSV generation here
-        # For now, return JSON with CSV structure
-        csv_data = []
-        for log in usage_logs:
-            csv_data.append({
-                'Date': log.created_at.isoformat() if log.created_at else '',
-                'Operation': log.operation_type,
-                'Input Tokens': log.input_tokens or 0,
-                'Output Tokens': log.output_tokens or 0,
-                'Total Cost': log.total_cost,
-                'AI Model': log.ai_model_used or '',
-                'Response Time (ms)': log.response_time_ms or 0,
-                'Project ID': log.project_id or '',
-                'Scene ID': log.scene_id or ''
-            })
-        
-        return jsonify({
-            'format': 'csv',
-            'data': csv_data,
-            'total_records': len(csv_data)
-        }), 200
-    
-    else:
-        # JSON format
-        return jsonify({
-            'format': 'json',
-            'usage_logs': [log.to_dict() for log in usage_logs],
-            'total_records': len(usage_logs),
-            'query_params': {
-                'start_date': start_date,
-                'end_date': end_date
-            }
-        }), 200
 
 @billing_bp.route('/invoices', methods=['GET'])
 @jwt_required()
 def get_invoices():
-    """Get user's billing invoices (placeholder for Stripe integration)"""
+    """Get billing invoices"""
     current_user_id = get_jwt_identity()
     
-    # In a real implementation, this would fetch invoices from Stripe
-    # For now, return placeholder data
+    # Mock invoice data
+    invoices = [
+        {
+            'id': f'inv_{current_user_id}_001',
+            'date': '2025-06-01',
+            'amount': 9.99,
+            'currency': 'USD',
+            'status': 'paid',
+            'description': 'Pro Plan - Monthly Subscription',
+            'download_url': '/api/billing/invoices/inv_001/download'
+        }
+    ]
     
     return jsonify({
-        'invoices': [],
-        'message': 'Invoice history will be available when payment processing is enabled'
+        'invoices': invoices,
+        'total_invoices': len(invoices)
+    }), 200
+
+@billing_bp.route('/payment-methods', methods=['GET'])
+@jwt_required()
+def get_payment_methods():
+    """Get saved payment methods"""
+    current_user_id = get_jwt_identity()
+    
+    # Mock payment methods
+    payment_methods = [
+        {
+            'id': 'pm_demo',
+            'type': 'card',
+            'brand': 'visa',
+            'last4': '4242',
+            'exp_month': 12,
+            'exp_year': 2026,
+            'is_default': True
+        }
+    ]
+    
+    return jsonify({
+        'payment_methods': payment_methods,
+        'total_methods': len(payment_methods)
+    }), 200
+
+@billing_bp.route('/status', methods=['GET'])
+def billing_status():
+    """Billing system status"""
+    return jsonify({
+        'billing_system': 'operational',
+        'payment_processor': 'demo_mode',
+        'available_plans': len(BILLING_PLANS),
+        'available_packages': len(TOKEN_PACKAGES),
+        'currencies_supported': ['USD'],
+        'message': 'Billing system ready (demo mode)'
     }), 200

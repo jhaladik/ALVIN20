@@ -1,7 +1,6 @@
-#!/usr/bin/env python3
+# config.py - COMPLETE CONFIGURATION WITH ALL MISSING VALUES
 """
-config.py - ALVIN Backend Configuration
-Place this file in backend/config.py (not in the app folder)
+Complete configuration file that includes all values referenced by routes
 """
 
 import os
@@ -47,102 +46,214 @@ class Config:
     # File Upload Configuration
     MAX_CONTENT_LENGTH = 16 * 1024 * 1024  # 16MB max file size
     UPLOAD_FOLDER = os.environ.get('UPLOAD_FOLDER') or 'uploads'
-    ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'docx'}
+    ALLOWED_EXTENSIONS = {'txt', 'pdf', 'doc', 'docx', 'rtf'}
     
-    # Email Configuration (for notifications)
+    # PAGINATION SETTINGS - MISSING VALUES THAT ROUTES EXPECT
+    PROJECTS_PER_PAGE = int(os.environ.get('PROJECTS_PER_PAGE', 20))
+    SCENES_PER_PAGE = int(os.environ.get('SCENES_PER_PAGE', 50))
+    OBJECTS_PER_PAGE = int(os.environ.get('OBJECTS_PER_PAGE', 100))
+    ANALYTICS_ITEMS_PER_PAGE = int(os.environ.get('ANALYTICS_ITEMS_PER_PAGE', 50))
+    
+    # ACTIVITY LOGGING
+    MAX_RECENT_ACTIVITIES = int(os.environ.get('MAX_RECENT_ACTIVITIES', 100))
+    ACTIVITY_RETENTION_DAYS = int(os.environ.get('ACTIVITY_RETENTION_DAYS', 30))
+    
+    # PROJECT LIMITS
+    MAX_PROJECTS_FREE = int(os.environ.get('MAX_PROJECTS_FREE', 3))
+    MAX_PROJECTS_PRO = int(os.environ.get('MAX_PROJECTS_PRO', 25))
+    MAX_PROJECTS_ENTERPRISE = int(os.environ.get('MAX_PROJECTS_ENTERPRISE', 100))
+    
+    # SCENE LIMITS
+    MAX_SCENES_PER_PROJECT_FREE = int(os.environ.get('MAX_SCENES_PER_PROJECT_FREE', 20))
+    MAX_SCENES_PER_PROJECT_PRO = int(os.environ.get('MAX_SCENES_PER_PROJECT_PRO', 100))
+    MAX_SCENES_PER_PROJECT_ENTERPRISE = int(os.environ.get('MAX_SCENES_PER_PROJECT_ENTERPRISE', 500))
+    
+    # OBJECT LIMITS
+    MAX_OBJECTS_PER_PROJECT_FREE = int(os.environ.get('MAX_OBJECTS_PER_PROJECT_FREE', 50))
+    MAX_OBJECTS_PER_PROJECT_PRO = int(os.environ.get('MAX_OBJECTS_PER_PROJECT_PRO', 200))
+    MAX_OBJECTS_PER_PROJECT_ENTERPRISE = int(os.environ.get('MAX_OBJECTS_PER_PROJECT_ENTERPRISE', 1000))
+    
+    # EMAIL CONFIGURATION
     MAIL_SERVER = os.environ.get('MAIL_SERVER')
-    MAIL_PORT = int(os.environ.get('MAIL_PORT') or 587)
-    MAIL_USE_TLS = os.environ.get('MAIL_USE_TLS', 'true').lower() in ['true', 'on', '1']
+    MAIL_PORT = int(os.environ.get('MAIL_PORT', 587))
+    MAIL_USE_TLS = os.environ.get('MAIL_USE_TLS', 'true').lower() == 'true'
     MAIL_USERNAME = os.environ.get('MAIL_USERNAME')
     MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
+    MAIL_DEFAULT_SENDER = os.environ.get('MAIL_DEFAULT_SENDER') or MAIL_USERNAME
     
-    # Redis Configuration (for caching and sessions)
-    REDIS_URL = os.environ.get('REDIS_URL') or 'redis://localhost:6379/0'
-    
-    # CORS Settings
-    CORS_ORIGINS = os.environ.get('CORS_ORIGINS', 'http://localhost:3000,http://localhost:5173').split(',')
-    
-    # Socket.IO Configuration
-    SOCKETIO_ASYNC_MODE = 'threading'
-    SOCKETIO_CORS_ALLOWED_ORIGINS = CORS_ORIGINS
-    
-    # Pagination
-    PROJECTS_PER_PAGE = 20
-    SCENES_PER_PAGE = 50
-    COMMENTS_PER_PAGE = 30
-    
-    # Export Settings
-    EXPORT_TIMEOUT = 60  # seconds
-    MAX_EXPORT_SIZE = 50 * 1024 * 1024  # 50MB
-    
-    # Stripe Configuration (for billing)
+    # STRIPE BILLING CONFIGURATION
     STRIPE_PUBLISHABLE_KEY = os.environ.get('STRIPE_PUBLISHABLE_KEY')
     STRIPE_SECRET_KEY = os.environ.get('STRIPE_SECRET_KEY')
     STRIPE_WEBHOOK_SECRET = os.environ.get('STRIPE_WEBHOOK_SECRET')
-    
-    # Payment Simulation (for development)
     PAYMENT_SIMULATION_MODE = os.environ.get('PAYMENT_SIMULATION_MODE', 'true').lower() == 'true'
     
-    # Logging Configuration
+    # REDIS CONFIGURATION (for caching and sessions)
+    REDIS_URL = os.environ.get('REDIS_URL') or 'redis://localhost:6379/0'
+    SESSION_TYPE = 'redis'
+    SESSION_PERMANENT = False
+    SESSION_USE_SIGNER = True
+    
+    # CORS CONFIGURATION
+    CORS_ORIGINS = os.environ.get('CORS_ORIGINS', 'http://localhost:3000,http://localhost:5173').split(',')
+    
+    # LOGGING CONFIGURATION
     LOG_LEVEL = os.environ.get('LOG_LEVEL', 'INFO')
-    LOG_FILE = os.environ.get('LOG_FILE')  # If None, logs to console
+    LOG_FORMAT = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    
+    # SECURITY SETTINGS
+    WTF_CSRF_ENABLED = True
+    WTF_CSRF_TIME_LIMIT = None
+    
+    # AI OPERATION TIMEOUTS
+    AI_OPERATION_TIMEOUT = int(os.environ.get('AI_OPERATION_TIMEOUT', 120))  # seconds
+    MAX_CONCURRENT_AI_OPERATIONS = int(os.environ.get('MAX_CONCURRENT_AI_OPERATIONS', 5))
+    
+    # EXPORT SETTINGS
+    EXPORT_MAX_FILE_SIZE = int(os.environ.get('EXPORT_MAX_FILE_SIZE', 50 * 1024 * 1024))  # 50MB
+    EXPORT_SUPPORTED_FORMATS = ['txt', 'html', 'pdf', 'docx', 'json']
+    
+    # COLLABORATION SETTINGS
+    MAX_COLLABORATORS_PER_PROJECT = int(os.environ.get('MAX_COLLABORATORS_PER_PROJECT', 10))
+    COLLABORATION_REALTIME_ENABLED = os.environ.get('COLLABORATION_REALTIME_ENABLED', 'true').lower() == 'true'
+    
+    # ANALYTICS SETTINGS
+    ANALYTICS_ENABLED = os.environ.get('ANALYTICS_ENABLED', 'true').lower() == 'true'
+    ANALYTICS_DATA_RETENTION_DAYS = int(os.environ.get('ANALYTICS_DATA_RETENTION_DAYS', 90))
+    
+    # RATE LIMITING
+    RATELIMIT_STORAGE_URL = REDIS_URL
+    RATELIMIT_DEFAULT = "100 per hour"
+    RATELIMIT_HEADERS_ENABLED = True
+    
+    # API RATE LIMITS BY ENDPOINT
+    RATE_LIMITS = {
+        'auth': '10 per minute',
+        'projects': '60 per minute', 
+        'scenes': '100 per minute',
+        'objects': '100 per minute',
+        'ai': '10 per minute',
+        'analytics': '30 per minute',
+        'collaboration': '120 per minute',
+        'billing': '20 per minute'
+    }
+    
+    # PLAN CONFIGURATIONS
+    PLAN_CONFIGS = {
+        'free': {
+            'max_projects': MAX_PROJECTS_FREE,
+            'max_scenes_per_project': MAX_SCENES_PER_PROJECT_FREE,
+            'max_objects_per_project': MAX_OBJECTS_PER_PROJECT_FREE,
+            'max_collaborators': 1,
+            'token_limit': TOKEN_LIMITS['free'],
+            'ai_operations_per_day': 10,
+            'export_formats': ['txt', 'html'],
+            'analytics_enabled': False,
+            'priority_support': False
+        },
+        'pro': {
+            'max_projects': MAX_PROJECTS_PRO,
+            'max_scenes_per_project': MAX_SCENES_PER_PROJECT_PRO,
+            'max_objects_per_project': MAX_OBJECTS_PER_PROJECT_PRO,
+            'max_collaborators': 5,
+            'token_limit': TOKEN_LIMITS['pro'],
+            'ai_operations_per_day': 100,
+            'export_formats': ['txt', 'html', 'pdf', 'docx'],
+            'analytics_enabled': True,
+            'priority_support': True
+        },
+        'enterprise': {
+            'max_projects': MAX_PROJECTS_ENTERPRISE,
+            'max_scenes_per_project': MAX_SCENES_PER_PROJECT_ENTERPRISE,
+            'max_objects_per_project': MAX_OBJECTS_PER_PROJECT_ENTERPRISE,
+            'max_collaborators': MAX_COLLABORATORS_PER_PROJECT,
+            'token_limit': TOKEN_LIMITS['enterprise'],
+            'ai_operations_per_day': 1000,
+            'export_formats': EXPORT_SUPPORTED_FORMATS,
+            'analytics_enabled': True,
+            'priority_support': True,
+            'custom_integrations': True
+        }
+    }
+    
+    # BACKUP AND RECOVERY
+    AUTO_BACKUP_ENABLED = os.environ.get('AUTO_BACKUP_ENABLED', 'false').lower() == 'true'
+    BACKUP_RETENTION_DAYS = int(os.environ.get('BACKUP_RETENTION_DAYS', 30))
+    
+    # MONITORING AND HEALTH CHECKS
+    HEALTH_CHECK_TIMEOUT = int(os.environ.get('HEALTH_CHECK_TIMEOUT', 5))
+    METRICS_ENABLED = os.environ.get('METRICS_ENABLED', 'true').lower() == 'true'
 
 class DevelopmentConfig(Config):
     """Development configuration"""
     DEBUG = True
     TESTING = False
     
-    # Use SQLite for development if no DATABASE_URL provided
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or 'sqlite:///alvin_dev.db'
-    
-    # More lenient rate limiting for development
-    CLAUDE_MAX_REQUESTS_PER_MINUTE = 100
-    
-    # Enable AI simulation mode by default in development
-    AI_SIMULATION_MODE = os.environ.get('AI_SIMULATION_MODE', 'true').lower() == 'true'
-    
-    # Enable payment simulation mode in development
-    PAYMENT_SIMULATION_MODE = True
-
-class TestingConfig(Config):
-    """Testing configuration"""
-    TESTING = True
-    DEBUG = True
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
-    
-    # Force simulation modes for testing
+    # Override for development
     AI_SIMULATION_MODE = True
     PAYMENT_SIMULATION_MODE = True
+    LOG_LEVEL = 'DEBUG'
     
-    # Faster token expiration for testing
-    JWT_ACCESS_TOKEN_EXPIRES = timedelta(minutes=15)
-    JWT_REFRESH_TOKEN_EXPIRES = timedelta(hours=1)
+    # Development database
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or 'sqlite:///alvin_dev.db'
+    
+    # Relaxed rate limiting for development
+    RATE_LIMITS = {
+        'auth': '100 per minute',
+        'projects': '300 per minute', 
+        'scenes': '500 per minute',
+        'objects': '500 per minute',
+        'ai': '50 per minute',
+        'analytics': '100 per minute',
+        'collaboration': '600 per minute',
+        'billing': '100 per minute'
+    }
 
 class ProductionConfig(Config):
     """Production configuration"""
     DEBUG = False
     TESTING = False
     
-    # Require real database URL in production
+    # Stricter settings for production
+    AI_SIMULATION_MODE = False
+    PAYMENT_SIMULATION_MODE = False
+    
+    # Production database (required)
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL')
     if not SQLALCHEMY_DATABASE_URI:
-        print("Warning: DATABASE_URL not set, using SQLite")
-        SQLALCHEMY_DATABASE_URI = 'sqlite:///alvin_prod.db'
+        raise ValueError("DATABASE_URL environment variable required for production")
     
-    # Stricter rate limiting in production
-    CLAUDE_MAX_REQUESTS_PER_MINUTE = 50
+    # Required API keys for production
+    if not Config.ANTHROPIC_API_KEY:
+        raise ValueError("ANTHROPIC_API_KEY environment variable required for production")
+    
+    if not Config.STRIPE_SECRET_KEY:
+        raise ValueError("STRIPE_SECRET_KEY environment variable required for production")
+
+class TestingConfig(Config):
+    """Testing configuration"""
+    DEBUG = True
+    TESTING = True
+    
+    # Test database
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
+    
+    # Disable CSRF for testing
+    WTF_CSRF_ENABLED = False
+    
+    # Test mode settings
+    AI_SIMULATION_MODE = True
+    PAYMENT_SIMULATION_MODE = True
+    
+    # Faster token expiration for testing
+    JWT_ACCESS_TOKEN_EXPIRES = timedelta(minutes=5)
+    
+    # Unlimited rate limits for testing
+    RATE_LIMITS = {}
 
 # Configuration mapping
 config = {
     'development': DevelopmentConfig,
-    'testing': TestingConfig,
     'production': ProductionConfig,
+    'testing': TestingConfig,
     'default': DevelopmentConfig
 }
-
-def get_config(config_name=None):
-    """Get configuration class by name"""
-    if config_name is None:
-        config_name = os.environ.get('FLASK_CONFIG', 'default')
-    
-    return config.get(config_name, DevelopmentConfig)
