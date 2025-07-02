@@ -129,14 +129,38 @@ def login():
     # Create JWT tokens
     access_token = create_access_token(identity=user.id)
     refresh_token = create_refresh_token(identity=user.id)
-    
+
     return jsonify({
-        'success': True,
         'message': 'Login successful',
-        'user': user.to_dict(),
-        'token': access_token,
-        'refresh_token': refresh_token
-    }), 200
+        'access_token': access_token,  # Primary token field
+        'token': access_token,         # Backward compatibility
+        'refresh_token': refresh_token,
+        'user': user_data,
+        'token_type': 'Bearer'
+    }), 200    
+
+# Add missing verify route if not present:
+@auth_bp.route('/verify', methods=['GET'])
+@jwt_required()
+def verify_token():
+    """Verify if the current token is valid"""
+    try:
+        current_user_id = get_jwt_identity()
+        user = User.query.get(current_user_id)
+        
+        if not user:
+            return jsonify({
+                'valid': False, 
+                'message': 'User not found'
+            }), 404
+        
+        return jsonify({
+            'valid': True,
+            'user_id': current_user_id,
+            'email': user.email,
+            'user': user.to_dict(),
+            'message': 'Token is valid'
+        }), 200
 
 @auth_bp.route('/logout', methods=['POST'])
 @jwt_required()

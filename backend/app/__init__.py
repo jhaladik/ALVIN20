@@ -1,4 +1,5 @@
-# app/__init__.py - ALVIN Complete Backend with Authentication
+# backend/app/__init__.py - CLEANED VERSION (Remove duplicate auth routes)
+
 import os
 import json
 from datetime import datetime, timedelta
@@ -71,32 +72,7 @@ def register_blueprints(app):
         print(f"   🎉 ALL BLUEPRINTS REGISTERED SUCCESSFULLY!")
     
     print(f"✅ Blueprint registration complete!\n")
-    
     return {'registered': registered, 'failed': failed}
-
-# Additional helper function for selective registration during development
-def register_blueprints_selective(app, enabled_blueprints=None):
-    """
-    Register only specific blueprints for development/testing.
-    
-    Args:
-        app: Flask application instance
-        enabled_blueprints: List of blueprint names to register
-                          If None, registers all blueprints
-    
-    Example:
-        # Register only core blueprints for testing
-        register_blueprints_selective(app, ['auth', 'projects'])
-    """
-    if enabled_blueprints is None:
-        return register_blueprints(app)
-    
-    print(f"\n🔧 Selective blueprint registration: {enabled_blueprints}")
-    
-    # Use the same registry but filter by enabled list
-    # ... (implementation similar to register_blueprints but with filtering)
-    
-    return register_blueprints(app)  # For now, fallback to full registration
 
 def create_app(config_name=None):
     """Create complete Flask application with authentication"""
@@ -108,11 +84,6 @@ def create_app(config_name=None):
     app.config['JWT_SECRET_KEY'] = os.environ.get('JWT_SECRET_KEY', 'jwt-dev-secret-key')
     app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(hours=24)
     app.config['JWT_ALGORITHM'] = 'HS256'
-    
-    # Debug JWT configuration
-    print(f"🔍 JWT Secret Key: {app.config['JWT_SECRET_KEY'][:10]}...")
-    print(f"🔍 JWT Algorithm: {app.config['JWT_ALGORITHM']}")
-    print(f"🔍 JWT Expires: {app.config['JWT_ACCESS_TOKEN_EXPIRES']}")
     
     # Database configuration
     database_url = os.environ.get('DATABASE_URL')
@@ -135,7 +106,7 @@ def create_app(config_name=None):
         jti = jwt_payload['jti']
         return jti in blacklisted_tokens
 
-    # CORS configuration - ONLY THIS LINE MATTERS:
+    # CORS configuration
     CORS(app, 
          origins=['http://localhost:3000', 'http://localhost:5173'],
          supports_credentials=True,
@@ -146,43 +117,14 @@ def create_app(config_name=None):
         cors_allowed_origins="*",
         async_mode='threading',
         logger=False,
-        engineio_logger=False,
-        ping_timeout=60,
-        ping_interval=25
-    )
+        engineio_logger=False)
     
-    # Import models
-    with app.app_context():
-        from app.models import User, Project, Scene, StoryObject
-        
-        # Create tables
-        db.create_all()
-        print("✅ Database tables created/verified")
-            
-        # Create demo user if it doesn't exist
-        demo_user = User.query.filter_by(email='demo@alvin.ai').first()
-        if not demo_user:
-            demo_user = User(
-                username='demo_user',
-                email='demo@alvin.ai',
-                full_name='Demo User',
-                plan='free',
-                is_active=True,
-                tokens_limit=10000
-            )
-            demo_user.set_password('demo123')
-            db.session.add(demo_user)
-            db.session.commit()
-            print("✅ Demo user created: demo@alvin.ai / demo123")
-
-    register_blueprints(app)
-
     # ============================================================================
-    # BASIC ROUTES
+    # BASIC APP ROUTES (Keep these - they're not auth duplicates)
     # ============================================================================
     
     @app.route('/')
-    def home():
+    def hello():
         return jsonify({
             'message': '🎭 ALVIN Backend is WORKING!',
             'status': 'running',
@@ -226,127 +168,7 @@ def create_app(config_name=None):
                 'password': 'demo123'
             }
         })
-    
-    # ============================================================================
-    # AUTHENTICATION ROUTES
-    # ============================================================================
 
-    @app.route('/api/auth/verify', methods=['GET'])
-    @jwt_required()
-    def verify_token():
-        """Verify if the current token is valid"""
-        try:
-            user_id_str = get_jwt_identity()
-            user_id = int(user_id_str)  # Convert back to int
-            auth_header = request.headers.get('Authorization', 'Not provided')
-            print(f"🔍 Debug - Token verification for user_id: {user_id} (from string: {user_id_str})")
-            print(f"🔍 Debug - Authorization header: {auth_header[:100]}...")
-            
-            from app.models import User
-            user = User.query.get(user_id)
-            
-            if not user:
-                print(f"❌ User {user_id} not found in database")
-                return jsonify({'valid': False, 'message': 'User not found'}), 404
-            
-            print(f"✅ Token verification successful for {user.email}")
-            return jsonify({
-                'valid': True,
-                'user_id': user_id,
-                'email': user.email,
-                'message': 'Token is valid'
-            }), 200
-            
-        except Exception as e:
-            print(f"❌ Token verification error: {e}")
-            import traceback
-            traceback.print_exc()
-            return jsonify({'valid': False, 'message': 'Token verification failed'}), 500
-    
-    @app.route('/api/debug/headers', methods=['GET', 'POST'])
-    def debug_headers():
-        """Debug endpoint to see all headers"""
-        headers_dict = dict(request.headers)
-        print(f"🔍 Debug - All headers received: {headers_dict}")
-        
-        return jsonify({
-            'method': request.method,
-            'headers': headers_dict,
-            'has_auth': 'Authorization' in headers_dict,
-            'auth_header': headers_dict.get('Authorization', 'Not provided')
-        }), 200
-    
-    @app.route('/api/debug/decode-token', methods=['POST'])
-    def debug_decode_token():
-        """Debug endpoint to decode JWT token without validation"""
-        try:
-            data = request.get_json()
-            token = data.get('token', '')
-            
-            if not token:
-                return jsonify({'error': 'No token provided'}), 400
-            
-            # Decode without verification to see contents
-            import jwt as pyjwt
-            try:
-                # First try to decode without verification
-                decoded_unverified = pyjwt.decode(token, options={"verify_signature": False})
-                print(f"🔍 Token payload (unverified): {decoded_unverified}")
-                
-                # Now try to decode with our secret
-                secret = app.config['JWT_SECRET_KEY']
-                algorithm = app.config['JWT_ALGORITHM']
-                
-                try:
-                    decoded_verified = pyjwt.decode(token, secret, algorithms=[algorithm])
-                    print(f"🔍 Token payload (verified): {decoded_verified}")
-                    
-                    return jsonify({
-                        'status': 'valid',
-                        'payload_unverified': decoded_unverified,
-                        'payload_verified': decoded_verified,
-                        'secret_used': secret[:10] + '...',
-                        'algorithm_used': algorithm
-                    }), 200
-                    
-                except pyjwt.InvalidTokenError as e:
-                    print(f"🔍 JWT verification failed: {e}")
-                    return jsonify({
-                        'status': 'invalid',
-                        'payload_unverified': decoded_unverified,
-                        'verification_error': str(e),
-                        'secret_used': secret[:10] + '...',
-                        'algorithm_used': algorithm
-                    }), 200
-                    
-            except Exception as e:
-                print(f"🔍 Token decode error: {e}")
-                return jsonify({'error': f'Token decode failed: {e}'}), 400
-                
-        except Exception as e:
-            print(f"🔍 Debug decode error: {e}")
-            return jsonify({'error': str(e)}), 500
-   
-    # ============================================================================
-    # PROJECT ROUTES
-    # ============================================================================
-  
-    # ============================================================================
-    # SCENE MANAGEMENT ROUTES
-    # ============================================================================
-    
-    # ============================================================================
-    # AI ROUTES (Simulation Mode)
-    # ============================================================================
-  
-    # ============================================================================
-    # ANALYTICS ROUTES
-    # ============================================================================
-  
-    # ============================================================================
-    # DEMO ROUTE
-    # ============================================================================
-    
     @app.route('/demo')
     def demo_info():
         """Demo information endpoint"""
@@ -374,12 +196,9 @@ def create_app(config_name=None):
                 'analyze_structure': '/api/ai/projects/{id}/analyze-structure',
                 'suggest_scenes': '/api/ai/projects/{id}/suggest-scenes',
                 'analytics': '/api/analytics/dashboard',
-                'debug_headers': '/api/debug/headers',
-                'debug_decode_token': '/api/debug/decode-token',
                 'billing': '/api/billing',
-                'billing' : '/api/billing/subscription',
-                'analytics': '/api/analytics',
-                'recent-activity' : '/api/analytics'
+                'billing_subscription': '/api/billing/subscription',
+                'analytics_activity': '/api/analytics/recent-activity'
             },
             'features': {
                 'authentication': 'JWT tokens',
@@ -419,7 +238,7 @@ def create_app(config_name=None):
         }), 500
     
     # ============================================================================
-    # JWT ERROR HANDLERS
+    # JWT ERROR HANDLERS (Keep these - they're not route duplicates)
     # ============================================================================
     
     @jwt.expired_token_loader
@@ -468,24 +287,11 @@ def create_app(config_name=None):
         return User.query.filter_by(id=user_id).one_or_none()
     
     # ============================================================================
-    # ADDITIONAL API ROUTES
+    # REGISTER BLUEPRINTS (This replaces duplicate auth routes)
     # ============================================================================
     
-    @app.route('/api/status/db', methods=['GET'])
-    def database_status():
-        """Check database connection status"""
-        try:
-            from app.models import User
-            User.query.first()
-            return jsonify({'database_connected': True}), 200
-        except Exception as e:
-            print(f"Database check error: {e}")
-            return jsonify({'database_connected': False, 'error': str(e)}), 500
-    
-    @app.route('/api/status/redis', methods=['GET'])
-    def redis_status():
-        """Check Redis connection status (simulated)"""
-        return jsonify({'redis_connected': True}), 200
+    # Register all blueprints
+    register_blueprints(app)
     
     # ============================================================================
     # SOCKET.IO EVENTS

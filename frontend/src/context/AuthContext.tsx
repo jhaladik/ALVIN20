@@ -1,4 +1,4 @@
-// storyforge-ai/src/context/AuthContext.tsx - UPDATED with JWT support
+// frontend/src/context/AuthContext.tsx - FIXED VERSION with Token Compatibility
 import { createContext, useState, useEffect, ReactNode } from 'react'
 import { api } from '../services/api'
 
@@ -6,9 +6,11 @@ type User = {
   id: string
   email: string
   username: string
+  full_name?: string
   plan: string
-  tokensRemaining: number
-  createdAt: string
+  tokens_remaining?: number
+  tokens_limit?: number
+  created_at: string
 }
 
 type AuthContextType = {
@@ -55,12 +57,14 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     const responseInterceptor = api.interceptors.response.use(
       (response) => response,
       (error) => {
-        if (error.response?.status === 401) {
-          // Token expired or invalid
+        if (error.response?.status === 401 && !error.config.url?.includes('/api/auth/me')) {
+          // Token expired or invalid (but not during initial auth check)
           localStorage.removeItem('authToken')
           setUser(null)
-          // Optionally redirect to login page
-          window.location.href = '/login'
+          // Only redirect if we're not already on a public page
+          if (!window.location.pathname.includes('/login') && !window.location.pathname.includes('/register')) {
+            window.location.href = '/login'
+          }
         }
         return Promise.reject(error)
       }
@@ -104,14 +108,20 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     try {
       const { data } = await api.post('/api/auth/login', { email, password })
       
-      // Store token if provided (JWT mode)
-      if (data.token) {
-        localStorage.setItem('authToken', data.token)
+      // ✅ FIXED: Handle both token field variations
+      const token = data.access_token || data.token
+      if (token) {
+        localStorage.setItem('authToken', token)
+      } else {
+        throw new Error('No authentication token received')
       }
       
       setUser(data.user)
     } catch (error: any) {
-      if (error.response?.data?.error) {
+      console.error('Login error:', error)
+      if (error.response?.data?.message) {
+        throw new Error(error.response.data.message)
+      } else if (error.response?.data?.error) {
         throw new Error(error.response.data.error)
       }
       throw new Error('Login failed')
@@ -123,16 +133,26 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const register = async (username: string, email: string, password: string) => {
     setIsLoading(true)
     try {
-      const { data } = await api.post('/api/auth/register', { username, email, password })
+      const { data } = await api.post('/api/auth/register', { 
+        username, 
+        email, 
+        password 
+      })
       
-      // Store token if provided (JWT mode)
-      if (data.token) {
-        localStorage.setItem('authToken', data.token)
+      // ✅ FIXED: Handle both token field variations
+      const token = data.access_token || data.token
+      if (token) {
+        localStorage.setItem('authToken', token)
+      } else {
+        throw new Error('No authentication token received')
       }
       
       setUser(data.user)
     } catch (error: any) {
-      if (error.response?.data?.error) {
+      console.error('Registration error:', error)
+      if (error.response?.data?.message) {
+        throw new Error(error.response.data.message)
+      } else if (error.response?.data?.error) {
         throw new Error(error.response.data.error)
       }
       throw new Error('Registration failed')
@@ -143,9 +163,11 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   const logout = async () => {
     try {
+      // Try to logout on server (but don't fail if it doesn't work)
       await api.post('/api/auth/logout')
     } catch (error) {
-      console.error('Logout failed', error)
+      console.error('Server logout failed', error)
+      // Continue with local logout even if server logout fails
     } finally {
       // Always clear local state
       localStorage.removeItem('authToken')

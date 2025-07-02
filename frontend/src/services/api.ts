@@ -10,6 +10,15 @@ export const api = axios.create({
   withCredentials: true, // Important for cookies/session authentication
 });
 
+// Add to api.ts interceptor
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem('authToken');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
 // Modify your error interceptor in api.ts
 api.interceptors.response.use(
   (response) => response,

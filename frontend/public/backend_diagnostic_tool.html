@@ -3,252 +3,626 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🔧 ALVIN Backend Diagnostic Tool</title>
+    <title>🔧 ALVIN Comprehensive Backend Diagnostic</title>
     <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-            background: #f8fafc;
-        }
-        .header {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 24px;
-            border-radius: 12px;
-            margin-bottom: 24px;
-            text-align: center;
+            color: #333;
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
         }
-        .summary {
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #e5e7eb;
+        }
+        
+        .header h1 {
+            color: #1f2937;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            color: #6b7280;
+            font-size: 1.1rem;
+        }
+        
+        .summary-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 16px;
-            margin-bottom: 24px;
+            gap: 20px;
+            margin-bottom: 30px;
         }
+        
         .summary-card {
-            background: white;
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            color: white;
             padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border-radius: 15px;
             text-align: center;
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
         }
+        
         .summary-number {
-            font-size: 32px;
-            font-weight: bold;
-            margin-bottom: 8px;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 5px;
         }
+        
         .summary-label {
-            color: #6b7280;
-            font-size: 14px;
+            font-size: 0.9rem;
+            opacity: 0.9;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
-        .test-controls {
-            background: white;
-            padding: 24px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            margin-bottom: 24px;
+        
+        .controls {
+            background: #f8fafc;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            border: 1px solid #e2e8f0;
         }
+        
         .controls-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 16px;
+            gap: 20px;
             margin-bottom: 20px;
         }
-        .input-group {
-            display: flex;
-            flex-direction: column;
-        }
+        
         .input-group label {
-            font-weight: 500;
-            margin-bottom: 4px;
+            display: block;
+            font-weight: 600;
             color: #374151;
-        }
-        .input-group input {
-            padding: 8px 12px;
-            border: 1px solid #d1d5db;
-            border-radius: 4px;
-            font-size: 14px;
-        }
-        button {
-            background: #3b82f6;
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 500;
-            transition: all 0.2s;
-        }
-        button:hover { background: #2563eb; }
-        button:disabled { background: #9ca3af; cursor: not-allowed; }
-        .test-button {
-            background: #059669;
-            padding: 16px 32px;
-            font-size: 16px;
-        }
-        .endpoint-results {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 16px;
-        }
-        .endpoint-card {
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            overflow: hidden;
-        }
-        .endpoint-header {
-            padding: 16px;
-            background: #f9fafb;
-            border-bottom: 1px solid #e5e7eb;
-            display: flex;
-            justify-content: between;
-            align-items: center;
-        }
-        .endpoint-title {
-            font-weight: 600;
-            color: #111827;
-        }
-        .status-badge {
-            padding: 4px 8px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: 500;
-        }
-        .status-success { background: #d1fae5; color: #065f46; }
-        .status-error { background: #fee2e2; color: #991b1b; }
-        .status-warning { background: #fef3c7; color: #92400e; }
-        .status-pending { background: #e0e7ff; color: #3730a3; }
-        .endpoint-body {
-            padding: 16px;
-        }
-        .endpoint-details {
-            font-family: monospace;
-            font-size: 12px;
-            background: #f9fafb;
-            padding: 12px;
-            border-radius: 4px;
-            margin-top: 8px;
-            max-height: 200px;
-            overflow-y: auto;
-        }
-        .fix-suggestions {
-            background: #fef3c7;
-            border: 1px solid #f59e0b;
-            border-radius: 6px;
-            padding: 12px;
-            margin-top: 12px;
-        }
-        .fix-title {
-            font-weight: 600;
-            color: #92400e;
             margin-bottom: 8px;
         }
-        .fix-text {
-            font-size: 13px;
-            color: #451a03;
+        
+        .input-group input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #d1d5db;
+            border-radius: 10px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        
+        .input-group input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        
+        .test-button {
+            width: 100%;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .test-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(16, 185, 129, 0.3);
+        }
+        
+        .test-button:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .category-section {
+            margin-bottom: 30px;
+        }
+        
+        .category-header {
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 12px 12px 0 0;
+            font-size: 1.2rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .endpoint-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 15px;
+            background: #fafafa;
+            padding: 20px;
+            border-radius: 0 0 12px 12px;
+            border: 1px solid #e5e7eb;
+        }
+        
+        .endpoint-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            border-left: 4px solid #e5e7eb;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+        
+        .endpoint-card.working {
+            border-left-color: #10b981;
+            background: linear-gradient(135deg, #ecfdf5 0%, #f0fdf4 100%);
+        }
+        
+        .endpoint-card.failed {
+            border-left-color: #ef4444;
+            background: linear-gradient(135deg, #fef2f2 0%, #fef7f7 100%);
+        }
+        
+        .endpoint-card.pending {
+            border-left-color: #f59e0b;
+            background: linear-gradient(135deg, #fffbeb 0%, #fefce8 100%);
+        }
+        
+        .endpoint-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .endpoint-name {
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: #1f2937;
+        }
+        
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .status-badge.working {
+            background: #10b981;
+            color: white;
+        }
+        
+        .status-badge.failed {
+            background: #ef4444;
+            color: white;
+        }
+        
+        .status-badge.pending {
+            background: #f59e0b;
+            color: white;
+        }
+        
+        .status-badge.auth-required {
+            background: #8b5cf6;
+            color: white;
+        }
+        
+        .endpoint-details {
+            margin-top: 15px;
+            font-size: 0.9rem;
+            color: #6b7280;
+        }
+        
+        .endpoint-path {
+            font-family: 'Monaco', 'Menlo', monospace;
+            background: #f3f4f6;
+            padding: 8px 12px;
+            border-radius: 6px;
+            margin: 10px 0;
+            border: 1px solid #d1d5db;
+        }
+        
+        .response-time {
+            color: #059669;
+            font-weight: 600;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e5e7eb;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #10b981, #059669);
+            transition: width 0.5s ease;
+            border-radius: 4px;
+        }
+        
+        .suggestions {
+            background: #f0f9ff;
+            border: 1px solid #bae6fd;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+        
+        .suggestions h4 {
+            color: #0369a1;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .suggestions ul {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .suggestions li {
+            padding: 5px 0;
+            color: #075985;
+        }
+        
+        .suggestions li::before {
+            content: "💡 ";
+            margin-right: 8px;
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
     </style>
 </head>
 <body>
-    <div class="header">
-        <h1>🔧 ALVIN Backend Diagnostic Tool</h1>
-        <p>Test all backend endpoints and identify missing routes, CORS issues, and other problems</p>
-    </div>
+    <div class="container">
+        <div class="header">
+            <h1>🔧 ALVIN Comprehensive Backend Diagnostic</h1>
+            <p>Test all 50+ backend endpoints, identify missing routes, CORS issues, and authentication problems</p>
+        </div>
 
-    <div class="summary" id="summary">
-        <div class="summary-card">
-            <div class="summary-number" id="total-endpoints">-</div>
-            <div class="summary-label">Total Endpoints</div>
+        <div class="summary-grid">
+            <div class="summary-card">
+                <div class="summary-number" id="total-endpoints">50+</div>
+                <div class="summary-label">Total Endpoints</div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-number" id="working-endpoints">-</div>
+                <div class="summary-label">Working</div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-number" id="failed-endpoints">-</div>
+                <div class="summary-label">Failed</div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-number" id="avg-response-time">-</div>
+                <div class="summary-label">Avg Response (ms)</div>
+            </div>
         </div>
-        <div class="summary-card">
-            <div class="summary-number" id="working-endpoints">-</div>
-            <div class="summary-label">Working</div>
-        </div>
-        <div class="summary-card">
-            <div class="summary-number" id="failed-endpoints">-</div>
-            <div class="summary-label">Failed</div>
-        </div>
-        <div class="summary-card">
-            <div class="summary-number" id="avg-response-time">-</div>
-            <div class="summary-label">Avg Response (ms)</div>
-        </div>
-    </div>
 
-    <div class="test-controls">
-        <div class="controls-grid">
-            <div class="input-group">
-                <label for="backendUrl">Backend URL:</label>
-                <input type="text" id="backendUrl" value="http://localhost:5000" placeholder="Backend URL">
+        <div class="controls">
+            <div class="controls-grid">
+                <div class="input-group">
+                    <label for="backendUrl">Backend URL:</label>
+                    <input type="text" id="backendUrl" value="http://localhost:5000" placeholder="Backend URL">
+                </div>
+                <div class="input-group">
+                    <label for="authToken">JWT Token (optional):</label>
+                    <input type="text" id="authToken" placeholder="JWT token for authenticated endpoints">
+                </div>
+                <div class="input-group">
+                    <label for="testEmail">Test Email:</label>
+                    <input type="text" id="testEmail" value="demo@alvin.ai" placeholder="Email for login test">
+                </div>
+                <div class="input-group">
+                    <label for="testPassword">Test Password:</label>
+                    <input type="password" id="testPassword" value="demo123" placeholder="Password for login test">
+                </div>
             </div>
-            <div class="input-group">
-                <label for="authToken">JWT Token (optional):</label>
-                <input type="text" id="authToken" placeholder="JWT token for authenticated endpoints">
-            </div>
-            <div class="input-group">
-                <label for="testEmail">Test Email:</label>
-                <input type="text" id="testEmail" value="demo@alvin.ai" placeholder="Email for login test">
-            </div>
-            <div class="input-group">
-                <label for="testPassword">Test Password:</label>
-                <input type="password" id="testPassword" value="demo123" placeholder="Password for login test">
+            <button class="test-button" onclick="runComprehensiveTests()" id="test-button">
+                🚀 Test All 50+ Endpoints
+            </button>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
             </div>
         </div>
-        <button class="test-button" onclick="runAllTests()">🚀 Test All Endpoints</button>
-    </div>
 
-    <div class="endpoint-results" id="results"></div>
+        <div id="results"></div>
+    </div>
 
     <script>
-        const endpoints = [
-            // Basic endpoints
-            { method: 'GET', path: '/health', name: 'Health Check', auth: false },
-            { method: 'GET', path: '/api', name: 'API Info', auth: false },
-            { method: 'GET', path: '/', name: 'Root', auth: false },
-            
-            // Auth endpoints
-            { method: 'POST', path: '/api/auth/login', name: 'Login', auth: false, 
-              data: () => ({ email: document.getElementById('testEmail').value, password: document.getElementById('testPassword').value }) },
-            { method: 'GET', path: '/api/auth/me', name: 'Profile', auth: true },
-            
-            // Projects endpoints
-            { method: 'GET', path: '/api/projects', name: 'List Projects', auth: true },
-            { method: 'POST', path: '/api/projects', name: 'Create Project', auth: true, 
-              data: () => ({ title: 'Test Project ' + Date.now(), description: 'Test project description' }) },
-            
-            // Analytics endpoints
-            { method: 'GET', path: '/api/analytics/dashboard', name: 'Analytics Dashboard', auth: true },
-            { method: 'GET', path: '/api/analytics/recent-activity?limit=10', name: 'Recent Activity', auth: true },
-            
-            // Scene endpoints
-            { method: 'GET', path: '/api/scenes', name: 'List Scenes', auth: true },
-            
-            // Other endpoints
-            { method: 'GET', path: '/api/billing/plans', name: 'Billing Plans', auth: false },
-            { method: 'GET', path: '/api/billing/subscription', name: 'User Subscription', auth: true },
-        ];
+        const comprehensiveEndpoints = {
+            "Authentication": [
+                { method: 'GET', path: '/health', name: 'Health Check', auth: false },
+                { method: 'GET', path: '/api', name: 'API Info', auth: false },
+                { method: 'GET', path: '/', name: 'Root', auth: false },
+                { method: 'GET', path: '/demo', name: 'Demo Info', auth: false },
+                { method: 'POST', path: '/api/auth/register', name: 'Register', auth: false, 
+                  data: () => ({ 
+                    username: 'test_' + Date.now(), 
+                    email: 'test_' + Date.now() + '@test.com', 
+                    password: 'testpass123',
+                    full_name: 'Test User'
+                  }) 
+                },
+                { method: 'POST', path: '/api/auth/login', name: 'Login', auth: false, 
+                  data: () => ({ email: document.getElementById('testEmail').value, password: document.getElementById('testPassword').value }) 
+                },
+                { method: 'GET', path: '/api/auth/me', name: 'Get Current User', auth: true },
+                { method: 'GET', path: '/api/auth/verify', name: 'Verify Token', auth: true },
+                { method: 'POST', path: '/api/auth/logout', name: 'Logout', auth: true },
+                { method: 'PUT', path: '/api/auth/profile', name: 'Update Profile', auth: true, 
+                  data: () => ({ full_name: 'Updated Test User' }) 
+                }
+            ],
+            "Projects": [
+                { method: 'GET', path: '/api/projects', name: 'List Projects', auth: true },
+                { method: 'POST', path: '/api/projects', name: 'Create Project', auth: true, 
+                  data: () => ({ 
+                    title: 'Test Project ' + Date.now(), 
+                    description: 'Test project description',
+                    genre: 'fantasy',
+                    target_audience: 'adult'
+                  }) 
+                },
+                { method: 'GET', path: '/api/projects/1', name: 'Get Project Details', auth: true },
+                { method: 'PUT', path: '/api/projects/1', name: 'Update Project', auth: true, 
+                  data: () => ({ title: 'Updated Project Title' }) 
+                },
+                { method: 'DELETE', path: '/api/projects/1', name: 'Delete Project', auth: true }
+            ],
+            "Scenes": [
+                { method: 'GET', path: '/api/scenes', name: 'List All Scenes', auth: true },
+                { method: 'GET', path: '/api/projects/1/scenes', name: 'List Project Scenes', auth: true },
+                { method: 'POST', path: '/api/projects/1/scenes', name: 'Create Scene', auth: true, 
+                  data: () => ({ 
+                    title: 'Test Scene ' + Date.now(), 
+                    content: 'This is a test scene content.',
+                    scene_type: 'action'
+                  }) 
+                },
+                { method: 'GET', path: '/api/projects/1/scenes/1', name: 'Get Scene Details', auth: true },
+                { method: 'PUT', path: '/api/projects/1/scenes/1', name: 'Update Scene', auth: true, 
+                  data: () => ({ content: 'Updated scene content' }) 
+                },
+                { method: 'DELETE', path: '/api/projects/1/scenes/1', name: 'Delete Scene', auth: true },
+                { method: 'POST', path: '/api/projects/1/scenes/reorder', name: 'Reorder Scenes', auth: true, 
+                  data: () => ({ sceneOrder: [{ id: 1, order: 1 }] }) 
+                }
+            ],
+            "Story Objects": [
+                { method: 'GET', path: '/api/projects/1/objects', name: 'List Objects', auth: true },
+                { method: 'GET', path: '/api/projects/1/objects?type=character', name: 'List Characters', auth: true },
+                { method: 'POST', path: '/api/projects/1/objects', name: 'Create Object', auth: true, 
+                  data: () => ({ 
+                    name: 'Test Character',
+                    type: 'character',
+                    description: 'A test character'
+                  }) 
+                },
+                { method: 'GET', path: '/api/projects/1/objects/1', name: 'Get Object Details', auth: true },
+                { method: 'PUT', path: '/api/projects/1/objects/1', name: 'Update Object', auth: true, 
+                  data: () => ({ description: 'Updated character description' }) 
+                },
+                { method: 'DELETE', path: '/api/projects/1/objects/1', name: 'Delete Object', auth: true },
+                { method: 'GET', path: '/api/projects/1/relationships', name: 'Get Relationships', auth: true },
+                { method: 'POST', path: '/api/projects/1/relationships', name: 'Update Relationship', auth: true, 
+                  data: () => ({ object1_id: 1, object2_id: 2, relationship_type: 'friendship' }) 
+                }
+            ],
+            "AI Operations": [
+                { method: 'GET', path: '/api/ai/status', name: 'AI Status', auth: false },
+                { method: 'POST', path: '/api/ai/analyze-idea', name: 'Analyze Story Idea', auth: true, 
+                  data: () => ({ 
+                    idea: 'A detective investigates mysterious disappearances in a small town',
+                    story_intent: 'Create a compelling mystery novel'
+                  }) 
+                },
+                { method: 'POST', path: '/api/ai/create-project-from-idea', name: 'Create Project from Idea', auth: true, 
+                  data: () => ({ 
+                    idea: 'A detective investigates mysterious disappearances in a small town',
+                    title: 'Mystery Investigation'
+                  }) 
+                },
+                { method: 'POST', path: '/api/ai/projects/1/analyze-structure', name: 'Analyze Project Structure', auth: true },
+                { method: 'POST', path: '/api/ai/projects/1/suggest-scenes', name: 'Suggest Scenes', auth: true },
+                { method: 'POST', path: '/api/ai/projects/1/generate-story', name: 'Generate Story', auth: true },
+                { method: 'POST', path: '/api/ai/projects/1/scenes/1/analyze', name: 'Analyze Scene', auth: true, 
+                  data: () => ({ critic_type: 'structure' }) 
+                },
+                { method: 'GET', path: '/api/ai/tasks', name: 'Get AI Tasks', auth: true }
+            ],
+            "Analytics": [
+                { method: 'GET', path: '/api/analytics/dashboard', name: 'Analytics Dashboard', auth: true },
+                { method: 'GET', path: '/api/analytics/recent-activity?limit=10', name: 'Recent Activity', auth: true },
+                { method: 'GET', path: '/api/analytics/projects/1', name: 'Project Analytics', auth: true }
+            ],
+            "Collaboration": [
+                { method: 'GET', path: '/api/collaboration/projects/1/collaborators', name: 'Get Collaborators', auth: true },
+                { method: 'POST', path: '/api/collaboration/projects/1/invite', name: 'Invite Collaborator', auth: true, 
+                  data: () => ({ email: 'collaborator@test.com', permission: 'editor' }) 
+                },
+                { method: 'DELETE', path: '/api/collaboration/projects/1/collaborators/2', name: 'Remove Collaborator', auth: true },
+                { method: 'GET', path: '/api/collaboration/projects/1/comments', name: 'Get Comments', auth: true },
+                { method: 'POST', path: '/api/collaboration/projects/1/comments', name: 'Add Comment', auth: true, 
+                  data: () => ({ 
+                    target_id: '1', 
+                    target_type: 'scene',
+                    content: 'This is a test comment'
+                  }) 
+                },
+                { method: 'DELETE', path: '/api/collaboration/projects/1/comments/1', name: 'Delete Comment', auth: true }
+            ],
+            "Billing": [
+                { method: 'GET', path: '/api/billing/plans', name: 'Get Billing Plans', auth: false },
+                { method: 'GET', path: '/api/billing/subscription', name: 'Get User Subscription', auth: true },
+                { method: 'POST', path: '/api/billing/subscribe', name: 'Subscribe to Plan', auth: true, 
+                  data: () => ({ plan_id: 'pro' }) 
+                },
+                { method: 'POST', path: '/api/billing/cancel', name: 'Cancel Subscription', auth: true },
+                { method: 'POST', path: '/api/billing/buy-tokens', name: 'Buy Tokens', auth: true, 
+                  data: () => ({ amount: 1000 }) 
+                },
+                { method: 'GET', path: '/api/billing/token-usage', name: 'Get Token Usage', auth: true }
+            ],
+            "System": [
+                { method: 'GET', path: '/api/status/db', name: 'Database Status', auth: false },
+                { method: 'GET', path: '/api/status/redis', name: 'Redis Status', auth: false },
+                { method: 'GET', path: '/api/debug/headers', name: 'Debug Headers', auth: false },
+                { method: 'POST', path: '/api/debug/decode-token', name: 'Debug Token', auth: false, 
+                  data: () => ({ token: localStorage.getItem('authToken') || 'test-token' }) 
+                }
+            ]
+        };
 
         let testResults = [];
         let authToken = '';
+        let totalTests = 0;
+        let completedTests = 0;
+
+        // Calculate total endpoints
+        Object.values(comprehensiveEndpoints).forEach(category => {
+            totalTests += category.length;
+        });
+
+        async function runComprehensiveTests() {
+            const button = document.getElementById('test-button');
+            button.disabled = true;
+            button.innerHTML = '<div class="loading"></div> Testing...';
+            
+            testResults = [];
+            completedTests = 0;
+            authToken = '';
+            
+            // Update total endpoints display
+            document.getElementById('total-endpoints').textContent = totalTests;
+            
+            // Clear previous results
+            document.getElementById('results').innerHTML = '';
+            
+            // First, try to login to get auth token
+            await attemptLogin();
+            
+            // Test all categories
+            for (const [categoryName, endpoints] of Object.entries(comprehensiveEndpoints)) {
+                await testCategory(categoryName, endpoints);
+            }
+            
+            // Display final summary
+            updateSummary();
+            
+            button.disabled = false;
+            button.innerHTML = '🚀 Test All 50+ Endpoints';
+        }
+
+        async function attemptLogin() {
+            try {
+                const email = document.getElementById('testEmail').value;
+                const password = document.getElementById('testPassword').value;
+                const backendUrl = document.getElementById('backendUrl').value.replace(/\/$/, '');
+                
+                const response = await fetch(`${backendUrl}/api/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    authToken = data.access_token || data.token;
+                    if (authToken) {
+                        document.getElementById('authToken').value = authToken;
+                    }
+                }
+            } catch (error) {
+                console.log('Auto-login failed, will use manual token if provided');
+            }
+        }
+
+        async function testCategory(categoryName, endpoints) {
+            // Create category section
+            const categorySection = document.createElement('div');
+            categorySection.className = 'category-section';
+            categorySection.innerHTML = `
+                <div class="category-header">
+                    <span>${getCategoryIcon(categoryName)}</span>
+                    <span>${categoryName}</span>
+                </div>
+                <div class="endpoint-grid" id="${categoryName.replace(/\s+/g, '-').toLowerCase()}-grid">
+                </div>
+            `;
+            
+            document.getElementById('results').appendChild(categorySection);
+            
+            const grid = document.getElementById(`${categoryName.replace(/\s+/g, '-').toLowerCase()}-grid`);
+            
+            // Test each endpoint in category
+            for (const endpoint of endpoints) {
+                const result = await testEndpoint(endpoint);
+                testResults.push(result);
+                completedTests++;
+                
+                // Update progress
+                const progress = (completedTests / totalTests) * 100;
+                document.getElementById('progress-fill').style.width = `${progress}%`;
+                
+                // Display result
+                displayEndpointResult(grid, endpoint, result);
+                
+                // Small delay to prevent overwhelming the server
+                await new Promise(resolve => setTimeout(resolve, 100));
+            }
+        }
 
         async function testEndpoint(endpoint) {
             const backendUrl = document.getElementById('backendUrl').value.replace(/\/$/, '');
             const startTime = Date.now();
             
             try {
-                const headers = {
-                    'Content-Type': 'application/json'
-                };
+                const headers = { 'Content-Type': 'application/json' };
                 
                 // Add auth token if required
-                if (endpoint.auth && authToken) {
-                    headers['Authorization'] = `Bearer ${authToken}`;
-                } else if (endpoint.auth && !authToken) {
-                    // Try to get token from input
-                    const inputToken = document.getElementById('authToken').value.trim();
-                    if (inputToken) {
-                        headers['Authorization'] = `Bearer ${inputToken}`;
+                if (endpoint.auth) {
+                    const token = authToken || document.getElementById('authToken').value.trim();
+                    if (token) {
+                        headers['Authorization'] = `Bearer ${token}`;
                     }
                 }
                 
@@ -257,7 +631,7 @@
                     headers: headers
                 };
                 
-                // Add data for POST requests
+                // Add data for POST/PUT requests
                 if (endpoint.data && (endpoint.method === 'POST' || endpoint.method === 'PUT')) {
                     requestOptions.body = JSON.stringify(endpoint.data());
                 }
@@ -268,192 +642,97 @@
                 let responseData = '';
                 try {
                     responseData = await response.text();
-                    // Try to parse as JSON
-                    JSON.parse(responseData);
+                    JSON.parse(responseData); // Validate JSON
                 } catch (e) {
-                    // Not JSON, that's OK
+                    // Not JSON, that's ok
                 }
                 
-                const result = {
+                return {
                     endpoint: endpoint,
-                    success: response.ok,
                     status: response.status,
                     statusText: response.statusText,
                     responseTime: responseTime,
-                    responseData: responseData.substring(0, 500),
-                    headers: Object.fromEntries(response.headers.entries())
+                    responseData: responseData,
+                    success: response.ok,
+                    authRequired: endpoint.auth && response.status === 401
                 };
-                
-                // Special handling for login endpoint
-                if (endpoint.path === '/api/auth/login' && response.ok) {
-                    try {
-                        const loginData = JSON.parse(responseData);
-                        if (loginData.access_token) {
-                            authToken = loginData.access_token;
-                            document.getElementById('authToken').value = authToken;
-                        }
-                    } catch (e) {
-                        console.error('Failed to parse login response:', e);
-                    }
-                }
-                
-                return result;
                 
             } catch (error) {
                 return {
                     endpoint: endpoint,
-                    success: false,
                     status: 0,
                     statusText: 'Network Error',
                     responseTime: Date.now() - startTime,
                     error: error.message,
-                    responseData: ''
+                    success: false,
+                    authRequired: false
                 };
             }
         }
 
-        function getStatusClass(result) {
-            if (result.success) return 'status-success';
-            if (result.status === 401 && result.endpoint.auth) return 'status-warning';
-            return 'status-error';
-        }
-
-        function getStatusText(result) {
-            if (result.success) return 'Working';
-            if (result.status === 401 && result.endpoint.auth) return 'Auth Required';
-            if (result.status === 404) return 'Not Found';
-            if (result.status === 0) return 'Network Error';
-            return `Error ${result.status}`;
-        }
-
-        function getFixSuggestions(result) {
-            if (result.success) return '';
+        function displayEndpointResult(container, endpoint, result) {
+            const card = document.createElement('div');
             
-            let suggestions = [];
+            let statusClass = 'pending';
+            let statusText = 'Pending';
             
-            if (result.status === 404) {
-                suggestions.push('• Blueprint not registered in Flask app');
-                suggestions.push('• Check route definition in backend/app/routes/');
-                suggestions.push('• Verify URL path matches route definition');
-            } else if (result.status === 0 || result.error === 'Network Error') {
-                suggestions.push('• Backend server is not running');
-                suggestions.push('• Check CORS configuration');
-                suggestions.push('• Verify backend URL is correct');
-            } else if (result.status === 401) {
-                if (result.endpoint.auth) {
-                    suggestions.push('• Expected - endpoint requires authentication');
-                    suggestions.push('• Login first to get JWT token');
-                } else {
-                    suggestions.push('• Unexpected auth requirement');
-                    suggestions.push('• Check route decorator (@jwt_required)');
-                }
-            } else if (result.status === 500) {
-                suggestions.push('• Server-side error in route handler');
-                suggestions.push('• Check backend logs for details');
-                suggestions.push('• Verify database connection');
+            if (result.success) {
+                statusClass = 'working';
+                statusText = 'Working';
+            } else if (result.authRequired) {
+                statusClass = 'auth-required';
+                statusText = 'Auth Required';
+            } else {
+                statusClass = 'failed';
+                statusText = 'Failed';
             }
             
-            return suggestions.join('\n');
-        }
-
-        function displayResults() {
-            const resultsContainer = document.getElementById('results');
-            resultsContainer.innerHTML = '';
+            card.className = `endpoint-card ${statusClass}`;
+            card.innerHTML = `
+                <div class="endpoint-header">
+                    <div class="endpoint-name">${endpoint.method} ${endpoint.name}</div>
+                    <div class="status-badge ${statusClass}">${statusText}</div>
+                </div>
+                <div class="endpoint-path">${endpoint.path}</div>
+                <div class="endpoint-details">
+                    Status: ${result.status} ${result.statusText}<br>
+                    Response Time: <span class="response-time">${result.responseTime}ms</span><br>
+                    ${endpoint.auth ? 'Auth: Required' : 'Auth: Not Required'}
+                </div>
+                ${result.authRequired ? '<div class="suggestions"><h4>💡 Fix Suggestions:</h4><ul><li>Expected - endpoint requires authentication</li><li>Login first to get JWT token</li></ul></div>' : ''}
+                ${result.error ? `<div class="suggestions"><h4>❌ Error:</h4><p>${result.error}</p></div>` : ''}
+            `;
             
-            testResults.forEach(result => {
-                const card = document.createElement('div');
-                card.className = 'endpoint-card';
-                
-                const statusClass = getStatusClass(result);
-                const statusText = getStatusText(result);
-                const fixSuggestions = getFixSuggestions(result);
-                
-                card.innerHTML = `
-                    <div class="endpoint-header">
-                        <div class="endpoint-title">${result.endpoint.method} ${result.endpoint.name}</div>
-                        <div class="status-badge ${statusClass}">${statusText}</div>
-                    </div>
-                    <div class="endpoint-body">
-                        <div><strong>Path:</strong> ${result.endpoint.path}</div>
-                        <div><strong>Status:</strong> ${result.status} ${result.statusText}</div>
-                        <div><strong>Response Time:</strong> ${result.responseTime}ms</div>
-                        ${result.endpoint.auth ? '<div><strong>Auth:</strong> Required</div>' : ''}
-                        
-                        ${result.responseData ? `
-                            <div class="endpoint-details">
-                                <strong>Response:</strong><br>
-                                ${result.responseData}
-                            </div>
-                        ` : ''}
-                        
-                        ${result.error ? `
-                            <div class="endpoint-details">
-                                <strong>Error:</strong><br>
-                                ${result.error}
-                            </div>
-                        ` : ''}
-                        
-                        ${fixSuggestions ? `
-                            <div class="fix-suggestions">
-                                <div class="fix-title">💡 Fix Suggestions:</div>
-                                <div class="fix-text">${fixSuggestions.replace(/\n/g, '<br>')}</div>
-                            </div>
-                        ` : ''}
-                    </div>
-                `;
-                
-                resultsContainer.appendChild(card);
-            });
+            container.appendChild(card);
         }
 
         function updateSummary() {
-            const total = testResults.length;
             const working = testResults.filter(r => r.success).length;
-            const failed = total - working;
-            const avgResponseTime = testResults.reduce((sum, r) => sum + r.responseTime, 0) / total;
+            const failed = testResults.filter(r => !r.success && !r.authRequired).length;
+            const authRequired = testResults.filter(r => r.authRequired).length;
             
-            document.getElementById('total-endpoints').textContent = total;
+            const totalResponseTime = testResults.reduce((sum, r) => sum + r.responseTime, 0);
+            const avgResponseTime = Math.round(totalResponseTime / testResults.length);
+            
             document.getElementById('working-endpoints').textContent = working;
-            document.getElementById('failed-endpoints').textContent = failed;
-            document.getElementById('avg-response-time').textContent = Math.round(avgResponseTime);
+            document.getElementById('failed-endpoints').textContent = failed + authRequired;
+            document.getElementById('avg-response-time').textContent = avgResponseTime;
         }
 
-        async function runAllTests() {
-            testResults = [];
-            document.getElementById('results').innerHTML = '<div style="text-align: center; padding: 40px;">🔄 Testing endpoints...</div>';
-            
-            // First, try to login to get auth token
-            const loginEndpoint = endpoints.find(e => e.path === '/api/auth/login');
-            if (loginEndpoint) {
-                const loginResult = await testEndpoint(loginEndpoint);
-                testResults.push(loginResult);
-                displayResults();
-                updateSummary();
-            }
-            
-            // Test all other endpoints
-            for (const endpoint of endpoints) {
-                if (endpoint.path === '/api/auth/login') continue; // Already tested
-                
-                const result = await testEndpoint(endpoint);
-                testResults.push(result);
-                displayResults();
-                updateSummary();
-                
-                // Small delay to avoid overwhelming the server
-                await new Promise(resolve => setTimeout(resolve, 100));
-            }
-            
-            console.log('All tests completed:', testResults);
+        function getCategoryIcon(categoryName) {
+            const icons = {
+                'Authentication': '🔐',
+                'Projects': '📝',
+                'Scenes': '🎬',
+                'Story Objects': '👥',
+                'AI Operations': '🤖',
+                'Analytics': '📊',
+                'Collaboration': '🤝',
+                'Billing': '💳',
+                'System': '⚙️'
+            };
+            return icons[categoryName] || '🔧';
         }
-
-        // Auto-populate backend URL
-        window.addEventListener('load', () => {
-            const currentHost = window.location.host;
-            if (currentHost.includes('localhost') || currentHost.includes('127.0.0.1')) {
-                document.getElementById('backendUrl').value = 'http://localhost:5000';
-            }
-        });
     </script>
 </body>
 </html>
